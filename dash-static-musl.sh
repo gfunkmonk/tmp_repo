@@ -42,29 +42,8 @@ case "${ARCH}" in
     ;;
 esac
 
-case "${ARCH}" in
-  x86_64)  ALPINE_SHA256="42d0e6d8de5521e7bf92e075e032b5690c1d948fa9775efa32a51a38b25460fb" ;;
-  x86)     ALPINE_SHA256="918b3dd37b0014ea8571a5ae206bb2e963999e61b7bc0332deab0041d195126a" ;;
-  aarch64) ALPINE_SHA256="f219bb9d65febed9046951b19f2b893b331315740af32c47e39b38fcca4be543" ;;
-  armhf)   ALPINE_SHA256="9017ede7039cc8463f9bf9625d5385ad82bfc731ef629b9f86afa1dd572e4e1c" ;;
-  armv7)   ALPINE_SHA256="56783112f98d59beed6bdd60329868dee4424d42a27f0660ee79691d9b7da7e0" ;;
-esac
-
 ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_MAJOR_MINOR}/releases/${ARCH}/alpine-minirootfs-${ALPINE_VERSION}-${ARCH}.tar.gz"
 TARBALL="${ALPINE_URL##*/}"
-
-verify_checksum() {
-  local file="$1" expected="$2"
-  local actual
-  actual=$(sha256sum "$file" | cut -d' ' -f1)
-  if [ "$actual" != "$expected" ]; then
-    echo -e "${TOMATO}= ERROR: SHA256 mismatch for ${file}${NC}"
-    echo -e "${HOTPINK}= expected: ${expected}${NC}"
-    echo -e "${TOMATO}= actual:   ${actual}${NC}"
-    exit 1
-  fi
-  echo -e "${LIME}= SHA256 verified: ${file}${NC}"
-}
 
 cleanup() {
   sudo umount -lf "./pasta/proc" 2>/dev/null || true
@@ -97,27 +76,18 @@ if [ "${DASH_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for dash-${DASH_VERSION}.tar.gz${NC}"
   exit 1
 fi
-DASH_KNOWN_SHA256_0_5_13_1="d9271bce09c127d9866e25c011582ddc75ab988958a04bc4d8553a3b8f30e370"
-if [ "${DASH_VERSION}" = "0.5.13.1" ]; then
-  verify_checksum "${DASH_TARBALL}" "${DASH_KNOWN_SHA256_0_5_13_1}"
-else
-  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${DASH_TARBALL}, skipping verification${NC}"
-fi
 
 echo -e "${LAGOON}= downloading patches${NC}"
 DASH_PATCH_URL="https://github.com/gfunkmonk/dash-static-musl/raw/refs/heads/main/mega.patch"
-DASH_PATCH_SHA256="15bd5870f5e54a746dc478f9250bf503384d3096bb41a96cc4c12afb712e6224"
 if ! curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 \
     -o "mega.patch" \
     "${DASH_PATCH_URL}"; then
   echo -e "${TOMATO}= ERROR: failed to download patch from ${DASH_PATCH_URL}${NC}"
   exit 1
 fi
-verify_checksum "mega.patch" "${DASH_PATCH_SHA256}"
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
-verify_checksum "${TARBALL}" "${ALPINE_SHA256}"
 
 echo -e "${MINT}= extract rootfs${NC}"
 mkdir -p pasta

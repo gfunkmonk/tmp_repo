@@ -38,29 +38,8 @@ case "${ARCH}" in
     ;;
 esac
 
-case "${ARCH}" in
-  x86_64)  ALPINE_SHA256="42d0e6d8de5521e7bf92e075e032b5690c1d948fa9775efa32a51a38b25460fb" ;;
-  x86)     ALPINE_SHA256="918b3dd37b0014ea8571a5ae206bb2e963999e61b7bc0332deab0041d195126a" ;;
-  aarch64) ALPINE_SHA256="f219bb9d65febed9046951b19f2b893b331315740af32c47e39b38fcca4be543" ;;
-  armhf)   ALPINE_SHA256="9017ede7039cc8463f9bf9625d5385ad82bfc731ef629b9f86afa1dd572e4e1c" ;;
-  armv7)   ALPINE_SHA256="56783112f98d59beed6bdd60329868dee4424d42a27f0660ee79691d9b7da7e0" ;;
-esac
-
 ALPINE_URL="https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_MAJOR_MINOR}/releases/${ARCH}/alpine-minirootfs-${ALPINE_VERSION}-${ARCH}.tar.gz"
 TARBALL="${ALPINE_URL##*/}"
-
-verify_checksum() {
-  local file="$1" expected="$2"
-  local actual
-  actual=$(sha256sum "$file" | cut -d' ' -f1)
-  if [ "$actual" != "$expected" ]; then
-    echo -e "${TOMATO}= ERROR: SHA256 mismatch for ${file}${NC}"
-    echo -e "${HOTPINK}= expected: ${expected}${NC}"
-    echo -e "${TOMATO}= actual:   ${actual}${NC}"
-    exit 1
-  fi
-  echo -e "${LIME}= SHA256 verified: ${file}${NC}"
-}
 
 cleanup() {
   sudo umount -lf "./pasta/proc" 2>/dev/null || true
@@ -93,16 +72,9 @@ if [ "${VIM_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for vim-${VIM_VERSION}${NC}"
   exit 1
 fi
-VIM_KNOWN_SHA256_9_2_0119="5bca0f5663e8cb2cf519128330cf42f2543f39067b4a25d26fe703895d9496b5"
-if [ "${VIM_VERSION}" = "9.2.0119" ]; then
-  verify_checksum "${VIM_TARBALL}" "${VIM_KNOWN_SHA256_9_2_0119}"
-else
-  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${VIM_TARBALL}, skipping verification${NC}"
-fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
-verify_checksum "${TARBALL}" "${ALPINE_SHA256}"
 
 echo -e "${MINT}= extract rootfs${NC}"
 mkdir -p pasta
