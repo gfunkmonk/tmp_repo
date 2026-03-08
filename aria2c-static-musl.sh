@@ -9,6 +9,8 @@ VIOLET="\033[38;2;143;0;255m"
 MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -22,7 +24,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -105,7 +107,7 @@ make -j\$(nproc) && \
 strip src/aria2c && \
 upx --lzma src/aria2c"
 if [ ! -f "./pasta/aria2-${ARIA2_VERSION}/src/aria2c" ]; then
-  echo "Error: aria2c binary not found after build" >&2
+  echo -e "${TOMATO}Error: aria2c binary not found after build${NC}" >&2
   exit 1
 fi
 mkdir -p dist
