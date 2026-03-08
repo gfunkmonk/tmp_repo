@@ -12,7 +12,8 @@ TOMATO="\033[38;2;255;99;71m"
 PEACH="\033[38;2;246;161;146m"
 LAGOON="\033[38;2;142;235;236m"
 HOTPINK="\033[38;2;255;105;180m"
-LIME="\E033[38;2;204;255;0m"
+LIME="\033[38;2;204;255;0m"
+OCHRE="\033[38;2;204;119;34m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -99,7 +100,7 @@ fi
 if [[ "${VIM_TARBALL}" == *.tar.gz ]]; then
   verify_checksum "${VIM_TARBALL}" "5bca0f5663e8cb2cf519128330cf42f2543f39067b4a25d26fe703895d9496b5"
 else
-  echo -e "${TAWNY}= WARNING: no hardcoded checksum for ${VIM_TARBALL}, skipping verification${NC}"
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${VIM_TARBALL}, skipping verification${NC}"
 fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
