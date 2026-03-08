@@ -145,10 +145,6 @@ cd axel-${AXEL_VERSION}/ && \
 ./configure CC=gcc LDFLAGS='-static' PKG_CONFIG='pkg-config --static' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip axel && \
-if [ ! -f "axel" ]; then
-  echo -e "${TOMATO}Error: axel binary not found after build${NC}" >&2
-  exit 1
-fi
 upx --lzma axel"
 mkdir -p dist
 cp "./pasta/axel-${AXEL_VERSION}/axel" "dist/axel-${ARCH}"
