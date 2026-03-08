@@ -51,10 +51,12 @@ DEBIAN_DEPS=(wget curl binutils)
 sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 
 echo -e "${AQUA}= downloading vim-${VIM_VERSION} tarball${NC}"
-VIM_TARBALL="vim-${VIM_VERSION}.tar.gz"
+VIM_TARBALL=""
 VIM_DOWNLOADED=false
 for mirror in "${VIM_MIRRORS[@]}"; do
   echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
+  VIM_EXT="${mirror##*.}"
+  VIM_TARBALL="vim-${VIM_VERSION}.tar.${VIM_EXT}"
   if curl -fsSL --retry 3 --retry-delay 2 -o "${VIM_TARBALL}" "${mirror}"; then
     echo -e "${MINT}= downloaded from: ${mirror}${NC}"
     VIM_DOWNLOADED=true
@@ -62,10 +64,11 @@ for mirror in "${VIM_MIRRORS[@]}"; do
   else
     echo -e "${LEMON}= failed: ${mirror}${NC}"
     rm -f "${VIM_TARBALL}"
+    VIM_TARBALL=""
   fi
 done
 if [ "${VIM_DOWNLOADED}" = false ]; then
-  echo -e "${TOMATO}= ERROR: all mirrors failed for vim-${VIM_VERSION}.tar.gz${NC}"
+  echo -e "${TOMATO}= ERROR: all mirrors failed for vim-${VIM_VERSION}${NC}"
   exit 1
 fi
 
@@ -79,8 +82,8 @@ echo -e "${PEACH}= copy resolv.conf and vim tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 cp "${VIM_TARBALL}" "./pasta/${VIM_TARBALL}"
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi
@@ -108,7 +111,7 @@ upx \
 python3-dev \
 perl-dev \
 perl && \
-tar xf vim-${VIM_VERSION}.tar.gz && \
+tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \
 sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
 ./configure CC='gcc' --disable-channel --disable-gpm --disable-gtktest --disable-gui --disable-netbeans --disable-nls --disable-selinux --disable-smack --disable-sysmouse --disable-xsmp --enable-multibyte --with-features=huge --with-tlib=ncursesw --without-x LDFLAGS='-static' CFLAGS='-Os -static -fno-stack-protector -no-pie' && \

@@ -9,6 +9,8 @@ VIOLET="\033[38;2;143;0;255m"
 MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -22,7 +24,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -32,9 +34,9 @@ TARBALL="${ALPINE_URL##*/}"
 
 ## unmount bind mounts on exit to avoid leaking mounts on failure
 cleanup() {
-  sudo umount -lf "pasta/proc" 2>/dev/null || true
-  sudo umount -lf "pasta/dev"  2>/dev/null || true
-  sudo umount -lf "pasta/sys"  2>/dev/null || true
+  sudo umount -lf "./pasta/proc" 2>/dev/null || true
+  sudo umount -lf "./pasta/dev"  2>/dev/null || true
+  sudo umount -lf "./pasta/sys"  2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -104,6 +106,10 @@ patch -p1 < ../aria2-1.37.0.conf.patch && \
 make -j\$(nproc) && \
 strip src/aria2c && \
 upx --lzma src/aria2c"
+if [ ! -f "./pasta/aria2-${ARIA2_VERSION}/src/aria2c" ]; then
+  echo -e "${TOMATO}Error: aria2c binary not found after build${NC}" >&2
+  exit 1
+fi
 mkdir -p dist
 cp "./pasta/aria2-${ARIA2_VERSION}/src/aria2c" "dist/aria2c-${ARCH}"
 if command -v file >/dev/null 2>&1; then echo -e "${ORANGE} File Info:  $(file "dist/aria2c-${ARCH}" | cut -d: -f2-)${NC}"; fi

@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-set -x
 
 ORANGE="\033[38;2;255;165;0m"
 LEMON="\033[38;2;255;244;79m"
@@ -83,8 +82,8 @@ echo -e "${PEACH}= copy resolv.conf and dash tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 cp "${DASH_TARBALL}" "./pasta/${DASH_TARBALL}"
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi
@@ -113,7 +112,7 @@ libedit-dev \
 libedit-static \
 upx \
 perl && \
-wget "https://github.com/gfunkmonk/dash-static-musl/raw/refs/heads/main/mega.patch" && \
+wget 'https://github.com/gfunkmonk/dash-static-musl/raw/refs/heads/main/mega.patch' && \
 tar xf dash-${DASH_VERSION}.tar.gz && \
 cd dash-${DASH_VERSION}/ && \
 patch -p1 --fuzz=4 < ../mega.patch && \

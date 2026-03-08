@@ -85,8 +85,8 @@ echo -e "${PEACH}= copy resolv.conf and wget tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 cp "${WGET_TARBALL}" "./pasta/${WGET_TARBALL}"
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi

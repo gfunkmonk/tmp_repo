@@ -52,7 +52,7 @@ DEBIAN_DEPS=(wget curl binutils)
 sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 
 echo -e "${AQUA}= downloading xz-${XZ_VERSION} tarball${NC}"
-XZ_TARBALL="xz-${XZ_VERSION}.tar.gz"
+XZ_TARBALL="xz-${XZ_VERSION}.tar.xz"
 XZ_DOWNLOADED=false
 for mirror in "${XZ_MIRRORS[@]}"; do
   echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
@@ -66,7 +66,7 @@ for mirror in "${XZ_MIRRORS[@]}"; do
   fi
 done
 if [ "${XZ_DOWNLOADED}" = false ]; then
-  echo -e "${TOMATO}= ERROR: all mirrors failed for xz-${XZ_VERSION}.tar.gz${NC}"
+  echo -e "${TOMATO}= ERROR: all mirrors failed for xz-${XZ_VERSION}.tar.xz${NC}"
   exit 1
 fi
 
@@ -80,8 +80,8 @@ echo -e "${PEACH}= copy resolv.conf and xz tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 cp "${XZ_TARBALL}" "./pasta/${XZ_TARBALL}"
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi
@@ -92,53 +92,47 @@ sudo mount --rbind /dev "./pasta/dev/"
 sudo mount --rbind /sys "./pasta/sys/"
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
-wget \
-make \
 clang \
+make \
+pkgconfig \
 git \
-xz-dev \
-libintl \
-libbsd-static \
-xz-libs \
-zlib \
-zlib-static \
-libselinux-dev \
-libssl3 \
-libbsd \
-libbsd-dev \
-gettext-libs \
-gettext-static \
-gettext-dev \
-gettext \
-python3 \
-openssl-misc \
-openssl-libs-static \
-openssl \
-zlib-dev \
-xz-dev \
-openssl-dev \
 automake \
+autoconf \
 libtool \
 bison \
 flex \
+python3 \
+perl \
+wget \
+texinfo \
 gettext \
-autoconf \
-gettext \
+gettext-dev \
+gettext-static \
+gettext-libs \
+xz-dev \
+xz-static \
+xz-libs \
+zlib \
+zlib-dev \
+zlib-static \
+openssl \
+openssl-dev \
+openssl-libs-static \
+openssl-misc \
+libssl3 \
+libintl \
+libbsd \
+libbsd-dev \
+libbsd-static \
+libselinux-dev \
 sqlite \
 sqlite-dev \
 pcre-dev \
-wget \
-texinfo \
 docbook-xsl \
 libxslt \
 docbook2x \
-gettext-dev \
-gettext-static \
-autoconf \
-automake \
-upx \
-perl && \
-tar xf xz-${XZ_VERSION}.tar.gz && \
+upx && \
+tar xf xz-${XZ_VERSION}.tar.xz && \
 cd xz-${XZ_VERSION}/ && \
 ./configure CC=clang --enable-static --disable-shared --disable-nls LDFLAGS='-static -Wl,--gc-sections -ffunction-sections -fdata-sections' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 CC=clang LDFLAGS='--static -Wl,--gc-sections -ffunction-sections -fdata-sections' make -j\$(nproc) && \
