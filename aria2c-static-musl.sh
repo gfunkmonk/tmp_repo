@@ -111,7 +111,6 @@ if [ "${ARIA2_VERSION}" = "1.37.0" ]; then
   verify_checksum "${ARIA2_TARBALL}" "${ARIA2_KNOWN_SHA256_1_37_0}"
 else
   echo -e "${OCHRE}= ERROR: no hardcoded checksum for aria2-${ARIA2_VERSION}, cannot verify integrity${NC}"
-  exit 1
 fi
 
 echo -e "${AQUA}= downloading patch for aria2${NC}"

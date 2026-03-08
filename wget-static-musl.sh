@@ -26,11 +26,8 @@ WGET_MIRRORS=(
   "https://mirror.team-cymru.com/gnu/wget/wget-${WGET_VERSION}.tar.gz"
   "https://ftp.wayne.edu/gnu/wget/wget-${WGET_VERSION}.tar.gz"
   "https://mirror.us-midwest-1.nexcess.net/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://ftpmirror.gnu.org/wget/wget-${WGET_VERSION}.tar.gz"
   "https://mirrors.ibiblio.org/gnu/wget/wget-${WGET_VERSION}.tar.gz"
   "https://mirror.csclub.uwaterloo.ca/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://mirror.cyberbits.eu/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://ftp.fau.de/gnu/wget/wget-${WGET_VERSION}.tar.gz"
 )
 
 case "${ARCH}" in

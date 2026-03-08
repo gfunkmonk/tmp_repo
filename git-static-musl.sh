@@ -147,8 +147,7 @@ cd git-${GIT_VERSION}/ && \
 ./configure CC=clang --without-tcltk --with-curl --with-openssl \
   --with-expat --sysconfdir=/etc --with-editor=nano \
   LDFLAGS='-static -Wl,--gc-sections -lcurl' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization \
-  -I/usr/include/x86_64-linux-gnu -isystem /usr/include/mit-krb5 -I/usr/include/p11-kit-1' && \
+  CFLAGS='-Os -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization && \
 CC=clang make NO_PERL=1 RUNTIME_PREFIX=1 -j\$(nproc) && \
 strip git && \
 upx --lzma git"

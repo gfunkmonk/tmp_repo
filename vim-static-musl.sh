@@ -24,7 +24,6 @@ ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 VIM_MIRRORS=(
   "https://github.com/vim/vim/archive/v${VIM_VERSION}/vim-${VIM_VERSION}.tar.gz"
   "https://fossies.org/linux/misc/vim-${VIM_VERSION}.tar.gz"
-  "https://archive.org/download/vim-${VIM_VERSION}.tar_202603/vim-${VIM_VERSION}.tar.gz"
 )
 
 case "${ARCH}" in
@@ -134,7 +133,7 @@ upx \
 python3-dev \
 perl-dev \
 perl && \
-tar xf "${VIM_TARBALL}" && \
+tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \
 sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
 ./configure CC='gcc' \
