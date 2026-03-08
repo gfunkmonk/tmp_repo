@@ -162,6 +162,7 @@ tar xf wget-${WGET_VERSION}.tar.gz && \
 cd wget-${WGET_VERSION}/ && \
 patch -p1 < ../wget-passive-ftp.patch && \
 ./configure CC=gcc --with-ssl=openssl --with-libidn --disable-nls \
+  --disable-rpath --sysconfdir=/etc \
   LDFLAGS='-static -lidn2 -lunistring' \
   PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -Wno-unterminated-string-initialization' \

@@ -142,7 +142,9 @@ patch \
 upx && \
 tar xf oksh-${OKSH_VERSION}.tar.gz && \
 cd oksh-${OKSH_VERSION}/ && \
-./configure --cc=gcc --cflags=\"-Os -fomit-frame-pointer\" --enable-curses --enable-lto --enable-static && \
+./configure --cc=gcc --cflags=\"-Os -fomit-frame-pointer\" \
+  --enable-curses --enable-lto --enable-static \
+  LDFLAGS='-static' PKG_CONFIG='pkg-config --static' && \
 make -j\$(nproc) && \
 strip oksh && \
 upx --ultra-brute oksh"

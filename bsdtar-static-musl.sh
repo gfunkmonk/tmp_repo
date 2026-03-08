@@ -153,7 +153,11 @@ cd libarchive-${BSDTAR_VERSION}/ && \
   LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -no-pie' && \
 make -j\$(nproc) && \
-gcc -static -o bsdtar tar/bsdtar-bsdtar.o tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a -lz -llzma -lzstd -lxml2 -lcrypto -lssl && \
+gcc -static -o bsdtar tar/bsdtar-bsdtar.o \
+  tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o \
+  tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o \
+  tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a \
+  -lz -llzma -lzstd -lxml2 -lcrypto -lssl && \
 strip bsdtar && \
 upx --lzma bsdtar"
 mkdir -p dist

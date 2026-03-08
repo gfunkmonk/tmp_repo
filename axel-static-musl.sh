@@ -142,7 +142,8 @@ libunistring-static \
 upx && \
 tar xf axel-${AXEL_VERSION}.tar.xz && \
 cd axel-${AXEL_VERSION}/ && \
-./configure CC=gcc LDFLAGS='-static' PKG_CONFIG='pkg-config --static' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
+./configure CC=gcc LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip axel && \
 upx --lzma axel"
