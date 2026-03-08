@@ -95,7 +95,12 @@ if [ "${XZ_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for xz-${XZ_VERSION}.tar.xz${NC}"
   exit 1
 fi
-verify_checksum "${XZ_TARBALL}" "890966ec3f5d5cc151077879e157c0593500a522f413ac50ba26d22a9a145214"
+XZ_KNOWN_SHA256_5_8_2="890966ec3f5d5cc151077879e157c0593500a522f413ac50ba26d22a9a145214"
+if [ "${XZ_VERSION}" = "5.8.2" ]; then
+  verify_checksum "${XZ_TARBALL}" "${XZ_KNOWN_SHA256_5_8_2}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${XZ_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"

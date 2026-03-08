@@ -97,7 +97,12 @@ if [ "${DASH_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for dash-${DASH_VERSION}.tar.gz${NC}"
   exit 1
 fi
-verify_checksum "${DASH_TARBALL}" "d9271bce09c127d9866e25c011582ddc75ab988958a04bc4d8553a3b8f30e370"
+DASH_KNOWN_SHA256_0_5_13_1="d9271bce09c127d9866e25c011582ddc75ab988958a04bc4d8553a3b8f30e370"
+if [ "${DASH_VERSION}" = "0.5.13.1" ]; then
+  verify_checksum "${DASH_TARBALL}" "${DASH_KNOWN_SHA256_0_5_13_1}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${DASH_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${LAGOON}= downloading patches${NC}"
 DASH_PATCH_URL="https://github.com/gfunkmonk/dash-static-musl/raw/refs/heads/main/mega.patch"

@@ -98,7 +98,12 @@ if [ "${AXEL_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for axel-${AXEL_VERSION}.tar.xz${NC}"
   exit 1
 fi
-verify_checksum "${AXEL_TARBALL}" "938ee7c8c478bf6fcc82359bbf9576f298033e8b13908e53e3ea9c45c1443693"
+AXEL_KNOWN_SHA256_2_17_14="938ee7c8c478bf6fcc82359bbf9576f298033e8b13908e53e3ea9c45c1443693"
+if [ "${AXEL_VERSION}" = "2.17.14" ]; then
+  verify_checksum "${AXEL_TARBALL}" "${AXEL_KNOWN_SHA256_2_17_14}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${AXEL_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"

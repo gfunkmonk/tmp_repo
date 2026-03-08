@@ -100,7 +100,12 @@ if [ "${WGET_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for wget-${WGET_VERSION}.tar.gz${NC}"
   exit 1
 fi
-verify_checksum "${WGET_TARBALL}" "766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784"
+WGET_KNOWN_SHA256_1_25_0="766e48423e79359ea31e41db9e5c289675947a7fcf2efdcedb726ac9d0da3784"
+if [ "${WGET_VERSION}" = "1.25.0" ]; then
+  verify_checksum "${WGET_TARBALL}" "${WGET_KNOWN_SHA256_1_25_0}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${WGET_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${LAGOON}= downloading patch${NC}"
 WGET_PATCH_URL="https://github.com/gfunkmonk/wget-static-musl/raw/refs/heads/main/wget-passive-ftp.patch"

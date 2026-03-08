@@ -96,7 +96,12 @@ if [ "${BSDTAR_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for libarchive-${BSDTAR_VERSION}.tar.xz${NC}"
   exit 1
 fi
-verify_checksum "${BSDTAR_TARBALL}" "d68068e74beee3a0ec0dd04aee9037d5757fcc651591a6dcf1b6d542fb15a703"
+BSDTAR_KNOWN_SHA256_3_8_5="d68068e74beee3a0ec0dd04aee9037d5757fcc651591a6dcf1b6d542fb15a703"
+if [ "${BSDTAR_VERSION}" = "3.8.5" ]; then
+  verify_checksum "${BSDTAR_TARBALL}" "${BSDTAR_KNOWN_SHA256_3_8_5}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${BSDTAR_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"

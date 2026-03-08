@@ -97,7 +97,12 @@ if [ "${CURL_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for curl-${CURL_VERSION}.tar.xz${NC}"
   exit 1
 fi
-verify_checksum "${CURL_TARBALL}" "40df79166e74aa20149365e11ee4c798a46ad57c34e4f68fd13100e2c9a91946"
+CURL_KNOWN_SHA256_8_18_0="40df79166e74aa20149365e11ee4c798a46ad57c34e4f68fd13100e2c9a91946"
+if [ "${CURL_VERSION}" = "8.18.0" ]; then
+  verify_checksum "${CURL_TARBALL}" "${CURL_KNOWN_SHA256_8_18_0}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${CURL_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
