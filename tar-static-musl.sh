@@ -17,17 +17,15 @@ OCHRE="\033[38;2;204;119;34m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
-GIT_VERSION="2.53.0"
+TAR_VERSION="1.35"
 ALPINE_VERSION="3.23.3"
 ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 
-GIT_MIRRORS=(
-  "https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.xz"
-  "https://mirrors.slackware.com/slackware/slackware-current/source/d/git/git-2.53.0.tar.xz"
-  "https://fossies.org/linux/misc/git-2.53.0.tar.xz"
-  "https://mirrors.omnios.org/git/git-2.53.0.tar.xz"
-  "https://source.ipfire.org/source-2.x/git-2.53.0.tar.xz"
-  "https://ftp2.osuosl.org/pub/blfs/conglomeration/git/git-2.53.0.tar.xz"
+TAR_MIRRORS=(
+  "https://ftp.gnu.org/gnu/tar/tar-${TAR_VERSION}.tar.xz"
+  "https://fossies.org/linux/misc/tar-${TAR_VERSION}.tar.xz"
+  "https://mirrors.slackware.com/slackware/slackware64-current/source/a/tar/tar-${TAR_VERSION}.tar.xz"
+  "https://mirrors.omnios.org/tar/tar-${TAR_VERSION}.tar.xz"
 )
 
 case "${ARCH}" in
@@ -78,30 +76,30 @@ DEBIAN_DEPS=(wget curl binutils)
 [ -n "${QEMU_ARCH}" ] && DEBIAN_DEPS+=(qemu-user-static)
 sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 
-echo -e "${AQUA}= downloading git-${GIT_VERSION} tarball${NC}"
-GIT_TARBALL="git-${GIT_VERSION}.tar.xz"
-GIT_DOWNLOADED=false
-for mirror in "${GIT_MIRRORS[@]}"; do
+echo -e "${AQUA}= downloading tar-${TAR_VERSION} tarball${NC}"
+TAR_TARBALL="tar-${TAR_VERSION}.tar.xz"
+TAR_DOWNLOADED=false
+for mirror in "${TAR_MIRRORS[@]}"; do
   echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
   if curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
-      -o "${GIT_TARBALL}" "${mirror}"; then
+      -o "${TAR_TARBALL}" "${mirror}"; then
     echo -e "${MINT}= downloaded from: ${mirror}${NC}"
-    GIT_DOWNLOADED=true
+    TAR_DOWNLOADED=true
     break
   else
     echo -e "${LEMON}= failed: ${mirror}${NC}"
-    rm -f "${GIT_TARBALL}"
+    rm -f "${TAR_TARBALL}"
   fi
 done
-if [ "${GIT_DOWNLOADED}" = false ]; then
-  echo -e "${TOMATO}= ERROR: all mirrors failed for git-${GIT_VERSION}.tar.xz${NC}"
+if [ "${TAR_DOWNLOADED}" = false ]; then
+  echo -e "${TOMATO}= ERROR: all mirrors failed for tar-${TAR_VERSION}.tar.xz${NC}"
   exit 1
 fi
-GIT_KNOWN_SHA256_2_53_0="5818bd7d80b061bbbdfec8a433d609dc8818a05991f731ffc4a561e2ca18c653"
-if [ "${GIT_VERSION}" = "2.53.0" ]; then
-  verify_checksum "${GIT_TARBALL}" "${GIT_KNOWN_SHA256_2_53_0}"
+TAR_KNOWN_SHA256_1_35="4d62ff37342ec7aed748535323930c7cf94acf71c3591882b26a7ea50f3edc16"
+if [ "${TAR_VERSION}" = "1.35" ]; then
+  verify_checksum "${TAR_TARBALL}" "${TAR_KNOWN_SHA256_1_35}"
 else
-  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${GIT_TARBALL}, skipping verification${NC}"
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${TAR_TARBALL}, skipping verification${NC}"
 fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
@@ -111,9 +109,9 @@ verify_checksum "${TARBALL}" "${ALPINE_SHA256}"
 echo -e "${MINT}= extract rootfs${NC}"
 mkdir -p pasta
 tar xf "${TARBALL}" -C pasta/
-echo -e "${PEACH}= copy resolv.conf and git tarball into chroot${NC}"
+echo -e "${PEACH}= copy resolv.conf and libarchive tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
-cp "${GIT_TARBALL}" "./pasta/${GIT_TARBALL}"
+cp "${TAR_TARBALL}" "./pasta/${TAR_TARBALL}"
 
 if [ -n "${QEMU_ARCH}" ]; then
   echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
@@ -125,35 +123,37 @@ echo -e "${VIOLET}= mount, bind and chroot into dir${NC}"
 sudo mount -t proc none "./pasta/proc/"
 sudo mount --rbind /dev "./pasta/dev/"
 sudo mount --rbind /sys "./pasta/sys/"
+# Note: --with-zlib, --without-bz2lib; lzma/zstd/xml2/openssl linked via pkg-config --static
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
-clang \
 make \
 pkgconfig \
-curl-dev \
-curl-static \
-openssl-dev \
-openssl-libs-static \
-zstd-dev \
-zstd-static \
-perl \
 zlib-dev \
 zlib-static \
-expat-dev \
-expat-static \
+xz-dev \
+xz-static \
+zstd-dev \
+zstd-static \
+lz4-dev \
+lz4-static \
+openssl-dev \
+openssl-libs-static \
+libxml2-dev \
+libxml2-static \
+libbz2 \
+bzip2-static \
 upx && \
-tar xf git-${GIT_VERSION}.tar.xz && \
-cd git-${GIT_VERSION}/ && \
-mkdir -p output/ && \
-./configure CC=clang --without-tcltk --with-curl --with-openssl \
-  --with-expat --sysconfdir=/etc --with-editor=nano --prefix=output/ \
-  LDFLAGS='-static -Wl,--gc-sections -lcurl' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization' && \
-CC=clang make NO_PERL=1 RUNTIME_PREFIX=1 -j\$(nproc) && \
-strip output/git && \
-upx --lzma output/git"
+tar xf tar-${TAR_VERSION}.tar.xz && \
+cd tar-${TAR_VERSION}/ && \
+FORCE_UNSAFE_CONFIGURE=1 ./configure CC=gcc  --without-selinux \
+  --disable-nls --disable-rpath --enable-largefile \
+  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -ffunction-sections -fdata-sections -no-pie' && \
+make -j\$(nproc) && \
+strip src/tar && \
+upx --lzma src/tar"
 mkdir -p dist
-cp "./pasta/git-${GIT_VERSION}/git" "dist/git-${ARCH}"
-if command -v file >/dev/null 2>&1; then echo -e "${ORANGE} File Info:  $(file "dist/git-${ARCH}" | cut -d: -f2-)${NC}"; fi
-tar -C dist -cJf "dist/git-${ARCH}.tar.xz" "git-${ARCH}"
-echo -e "${LEMON}= All done! Binary: dist/git-${ARCH} ($(du -sh "dist/git-${ARCH}" | cut -f1))${NC}"
+cp "./pasta/tar-${TAR_VERSION}/src/tar" "dist/tar-${ARCH}"
+if command -v file >/dev/null 2>&1; then echo -e "${ORANGE} File Info:  $(file "dist/tar-${ARCH}" | cut -d: -f2-)${NC}"; fi
+tar -C dist -cJf "dist/tar-${ARCH}.tar.xz" "tar-${ARCH}"
+echo -e "${LEMON}= All done! Binary: dist/tar-${ARCH} ($(du -sh "dist/tar-${ARCH}" | cut -f1))${NC}"
