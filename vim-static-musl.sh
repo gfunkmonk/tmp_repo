@@ -13,6 +13,7 @@ PEACH="\033[38;2;246;161;146m"
 LAGOON="\033[38;2;142;235;236m"
 HOTPINK="\033[38;2;255;105;180m"
 LIME="\033[38;2;204;255;0m"
+OCHRE="\033[38;2;204;119;34m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -93,7 +94,12 @@ if [ "${VIM_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for vim-${VIM_VERSION}${NC}"
   exit 1
 fi
-verify_checksum "${VIM_TARBALL}" "5bca0f5663e8cb2cf519128330cf42f2543f39067b4a25d26fe703895d9496b5"
+VIM_KNOWN_SHA256_9_2_0119="5bca0f5663e8cb2cf519128330cf42f2543f39067b4a25d26fe703895d9496b5"
+if [ "${VIM_VERSION}" = "9.2.0119" ]; then
+  verify_checksum "${VIM_TARBALL}" "${VIM_KNOWN_SHA256_9_2_0119}"
+else
+  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${VIM_TARBALL}, skipping verification${NC}"
+fi
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
