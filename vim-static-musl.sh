@@ -147,10 +147,6 @@ sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
   CFLAGS='-Os -static -fno-stack-protector -no-pie' && \
 CC='gcc' make -j\$(nproc) && \
 strip src/vim && \
-if [ ! -f "vim-${VIM_VERSION}/src/vim" ]; then
-  echo -e "${TOMATO}Error: vim binary not found after build${NC}" >&2
-  exit 1
-fi
 upx --ultra-brute src/vim"
 mkdir -p dist
 cp "./pasta/vim-${VIM_VERSION}/src/vim" "dist/vim-${ARCH}"

@@ -145,10 +145,6 @@ cd oksh-${OKSH_VERSION}/ && \
 ./configure --cc=gcc --cflags=\"-Os -fomit-frame-pointer\" --enable-curses --enable-lto --enable-static && \
 make -j\$(nproc) && \
 strip oksh && \
-if [ ! -f "oksh-${OKSH_VERSION}/oksh" ]; then
-  echo -e "${TOMATO}Error: oksh binary not found after build${NC}" >&2
-  exit 1
-fi
 upx --ultra-brute oksh"
 mkdir -p dist
 cp "./pasta/oksh-${OKSH_VERSION}/oksh" "dist/oksh-${ARCH}"

@@ -137,10 +137,6 @@ cd xz-${XZ_VERSION}/ && \
   CFLAGS='-Os -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization' && \
 CC=clang LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
 strip src/xz/xz && \
-if [ ! -f "xz-${XZ_VERSION}/src/xz/xz" ]; then
-  echo -e "${TOMATO}Error: xz binary not found after build${NC}" >&2
-  exit 1
-fi
 upx --lzma src/xz/xz"
 mkdir -p dist
 cp "./pasta/xz-${XZ_VERSION}/src/xz/xz" "dist/xz-${ARCH}"
