@@ -13,7 +13,6 @@ PEACH="\033[38;2;246;161;146m"
 LAGOON="\033[38;2;142;235;236m"
 HOTPINK="\033[38;2;255;105;180m"
 LIME="\033[38;2;204;255;0m"
-OCHRE="\033[38;2;204;119;34m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -24,7 +23,7 @@ ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 VIM_MIRRORS=(
   "https://github.com/vim/vim/archive/v${VIM_VERSION}/vim-${VIM_VERSION}.tar.gz"
   "https://fossies.org/linux/misc/vim-${VIM_VERSION}.tar.gz"
-  "http://vim.lyn.dk/vim-${VIM_VERSION}.tar.bz2"
+  "https://archive.org/download/vim-${VIM_VERSION}.tar_202603/vim-${VIM_VERSION}.tar.gz"
 )
 
 case "${ARCH}" in
@@ -76,12 +75,10 @@ DEBIAN_DEPS=(wget curl binutils)
 sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 
 echo -e "${AQUA}= downloading vim-${VIM_VERSION} tarball${NC}"
-VIM_TARBALL=""
+VIM_TARBALL="vim-${VIM_VERSION}.tar.gz"
 VIM_DOWNLOADED=false
 for mirror in "${VIM_MIRRORS[@]}"; do
   echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
-  VIM_EXT="${mirror##*.}"
-  VIM_TARBALL="vim-${VIM_VERSION}.tar.${VIM_EXT}"
   if curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
       -o "${VIM_TARBALL}" "${mirror}"; then
     echo -e "${MINT}= downloaded from: ${mirror}${NC}"
@@ -90,18 +87,13 @@ for mirror in "${VIM_MIRRORS[@]}"; do
   else
     echo -e "${LEMON}= failed: ${mirror}${NC}"
     rm -f "${VIM_TARBALL}"
-    VIM_TARBALL=""
   fi
 done
 if [ "${VIM_DOWNLOADED}" = false ]; then
   echo -e "${TOMATO}= ERROR: all mirrors failed for vim-${VIM_VERSION}${NC}"
   exit 1
 fi
-if [[ "${VIM_TARBALL}" == *.tar.gz ]]; then
-  verify_checksum "${VIM_TARBALL}" "5bca0f5663e8cb2cf519128330cf42f2543f39067b4a25d26fe703895d9496b5"
-else
-  echo -e "${OCHRE}= WARNING: no hardcoded checksum for ${VIM_TARBALL}, skipping verification${NC}"
-fi
+verify_checksum "${VIM_TARBALL}" "5bca0f5663e8cb2cf519128330cf42f2543f39067b4a25d26fe703895d9496b5"
 
 echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
 wget -c "${ALPINE_URL}"
