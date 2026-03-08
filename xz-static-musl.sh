@@ -10,6 +10,8 @@ MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
 PEACH="\033[38;2;246;161;146m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -31,7 +33,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -137,6 +139,10 @@ cd xz-${XZ_VERSION}/ && \
 ./configure CC=clang --enable-static --disable-shared --disable-nls LDFLAGS='-static -Wl,--gc-sections -ffunction-sections -fdata-sections' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 CC=clang LDFLAGS='--static -Wl,--gc-sections -ffunction-sections -fdata-sections' make -j\$(nproc) && \
 strip src/xz/xz && \
+if [ ! -f "./pasta/xz-${XZ_VERSION}/src/xz/xz" ]; then
+  echo -e "${TOMATO}Error: xz binary not found after build${NC}" >&2
+  exit 1
+fi
 upx --lzma src/xz/xz"
 mkdir -p dist
 cp "./pasta/xz-${XZ_VERSION}/src/xz/xz" "dist/xz-${ARCH}"

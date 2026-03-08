@@ -9,6 +9,9 @@ VIOLET="\033[38;2;143;0;255m"
 MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
+PEACH="\033[38;2;246;161;146m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -23,7 +26,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -52,7 +55,7 @@ echo -e "${MINT}= extract rootfs${NC}"
 mkdir -p pasta
 tar xf "${TARBALL}" -C pasta/
 
-echo -e "${TOMATO}= copy resolv.conf into the folder${NC}"
+echo -e "${PEACH}= copy resolv.conf into the folder${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 
 if [ -n "${QEMU_ARCH}" ]; then
@@ -89,13 +92,11 @@ cd axel-${AXEL_VERSION}/ && \
 ./configure CC=gcc LDFLAGS='-static' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip axel && \
-upx --lzma axel"
-
 if [ ! -f "./pasta/axel-${AXEL_VERSION}/axel" ]; then
   echo -e "${TOMATO}Error: axel binary not found after build${NC}" >&2
   exit 1
 fi
-
+upx --lzma axel"
 mkdir -p dist
 cp "./pasta/axel-${AXEL_VERSION}/axel" "dist/axel-${ARCH}"
 if command -v file >/dev/null 2>&1; then echo -e "${ORANGE} File Info:  $(file "dist/axel-${ARCH}" | cut -d: -f2-)${NC}"; fi

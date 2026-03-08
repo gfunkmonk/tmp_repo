@@ -10,6 +10,8 @@ MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
 PEACH="\033[38;2;246;161;146m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -36,7 +38,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -125,6 +127,10 @@ patch -p1 < ../wget-passive-ftp.patch && \
 ./configure CC=gcc --with-ssl=openssl --with-libidn --disable-nls LDFLAGS='-static -lidn2 -lunistring' CFLAGS='-Os -Wno-unterminated-string-initialization' PERL=/usr/bin/perl && \
 make -j\$(nproc) && \
 strip src/wget && \
+if [ ! -f "./pasta/wget-${WGET_VERSION}/src/wget" ]; then
+  echo -e "${TOMATO}Error: wget binary not found after build${NC}" >&2
+  exit 1
+fi
 upx --lzma src/wget"
 mkdir -p dist
 cp "./pasta/wget-${WGET_VERSION}/src/wget" "dist/wget-${ARCH}"

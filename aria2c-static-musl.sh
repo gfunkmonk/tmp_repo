@@ -9,6 +9,7 @@ VIOLET="\033[38;2;143;0;255m"
 MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
+PEACH="\033[38;2;246;161;146m"
 LAGOON="\033[38;2;142;235;236m"
 HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
@@ -61,7 +62,7 @@ echo -e "${MINT}= extract rootfs${NC}"
 mkdir -p pasta
 tar xf "${TARBALL}" -C pasta/
 
-echo -e "${TOMATO}= copy resolv.conf into the folder${NC}"
+echo -e "${PEACH}= copy resolv.conf into the folder${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 
 if [ -n "${QEMU_ARCH}" ]; then
@@ -105,11 +106,11 @@ patch -p1 < ../aria2-1.37.0.conf.patch && \
 ./configure CC=gcc ARIA2_STATIC=yes --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt --without-gnutls --with-openssl --disable-bittorrent --with-libcares --with-sqlite3 --enable-shared=no --enable-static --disable-shared LDFLAGS='-static' PKG_CONFIG='pkg-config --static' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip src/aria2c && \
-upx --lzma src/aria2c"
 if [ ! -f "./pasta/aria2-${ARIA2_VERSION}/src/aria2c" ]; then
   echo -e "${TOMATO}Error: aria2c binary not found after build${NC}" >&2
   exit 1
 fi
+upx --lzma src/aria2c"
 mkdir -p dist
 cp "./pasta/aria2-${ARIA2_VERSION}/src/aria2c" "dist/aria2c-${ARCH}"
 if command -v file >/dev/null 2>&1; then echo -e "${ORANGE} File Info:  $(file "dist/aria2c-${ARCH}" | cut -d: -f2-)${NC}"; fi

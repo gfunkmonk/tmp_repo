@@ -10,6 +10,8 @@ MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
 PEACH="\033[38;2;246;161;146m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -33,7 +35,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -117,6 +119,10 @@ cd curl-${CURL_VERSION}/ && \
 ./configure --disable-shared --enable-static --disable-ldap --enable-ipv6 --enable-unix-sockets --with-ssl --with-libssh2 --disable-docs --disable-manual --without-libpsl CC=clang LDFLAGS='-static' PKG_CONFIG='pkg-config --static' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) V=1 LDFLAGS='-static -all-static' && \
 strip src/curl && \
+if [ ! -f "./pasta/curl-${CURL_VERSION}/src/curll" ]; then
+  echo -e "${TOMATO}Error: curl binary not found after build${NC}" >&2
+  exit 1
+fi
 upx --lzma src/curl"
 mkdir -p dist
 cp "./pasta/curl-${CURL_VERSION}/src/curl" "dist/curl-${ARCH}"

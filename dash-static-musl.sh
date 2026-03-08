@@ -10,6 +10,8 @@ MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
 PEACH="\033[38;2;246;161;146m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -33,7 +35,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -120,6 +122,10 @@ autoreconf -f -i && \
 ./configure --enable-static LDFLAGS='-static' CFLAGS='-Os -no-pie -fomit-frame-pointer -fstack-clash-protection' CXXFLAGS='-fno-delete-null-pointer-checks -fno-schedule-insns2' && \
 make -j\$(nproc) && \
 strip src/dash && \
+if [ ! -f "./pasta/dash-${DASH_VERSION}/src/dash" ]; then
+  echo -e "${TOMATO}Error: dash binary not found after build${NC}" >&2
+  exit 1
+fi
 upx --lzma src/dash"
 mkdir -p dist
 cp "./pasta/dash-${DASH_VERSION}/src/dash" "dist/dash-${ARCH}"

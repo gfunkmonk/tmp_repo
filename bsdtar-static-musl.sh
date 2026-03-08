@@ -10,6 +10,8 @@ MINT="\033[38;2;152;255;152m"
 AQUA="\033[38;2;18;254;202m"
 TOMATO="\033[38;2;255;99;71m"
 PEACH="\033[38;2;246;161;146m"
+LAGOON="\033[38;2;142;235;236m"
+HOTPINK="\033[38;2;255;105;180m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -32,7 +34,7 @@ case "${ARCH}" in
   armhf)   QEMU_ARCH="arm" ;;
   armv7)   QEMU_ARCH="arm" ;;
   *)
-    echo "Unknown architecture: ${ARCH}"
+    echo -e "${LAGOON}Unknown architecture: ${HOTPINK}${ARCH}${NC}"
     exit 1
     ;;
 esac
@@ -150,6 +152,10 @@ cd libarchive-${BSDTAR_VERSION}/ && \
 LDFLAGS='-static' make -j\$(nproc) && \
 gcc -static -o bsdtar tar/bsdtar-bsdtar.o tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a -lz -llzma -lzstd -lxml2 -lcrypto -lssl && \
 strip bsdtar && \
+if [ ! -f "./pasta/bsdtar-${BSDTAR_VERSION}/bsdtar" ]; then
+  echo -e "${TOMATO}Error: bsdtar binary not found after build${NC}" >&2
+  exit 1
+fi
 upx --lzma bsdtar"
 mkdir -p dist
 cp "./pasta/libarchive-${BSDTAR_VERSION}/bsdtar" "dist/bsdtar-${ARCH}"
