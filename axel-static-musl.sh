@@ -33,9 +33,9 @@ TARBALL="${ALPINE_URL##*/}"
 
 ## unmount filesystems on exit to avoid orphaned mounts
 cleanup() {
-  sudo umount -l ./pasta/proc/ 2>/dev/null || true
-  sudo umount -l ./pasta/dev/  2>/dev/null || true
-  sudo umount -l ./pasta/sys/  2>/dev/null || true
+  sudo umount -lf "./pasta/proc" 2>/dev/null || true
+  sudo umount -lf "./pasta/dev"  2>/dev/null || true
+  sudo umount -lf "./pasta/sys"  2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -55,8 +55,8 @@ tar xf "${TARBALL}" -C pasta/
 echo -e "${TOMATO}= copy resolv.conf into the folder${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi

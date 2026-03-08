@@ -53,7 +53,7 @@ DEBIAN_DEPS=(wget curl binutils libxml2-dev)
 sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 
 echo -e "${AQUA}= downloading libarchive-${BSDTAR_VERSION} tarball${NC}"
-BSDTAR_TARBALL="libarchive-${BSDTAR_VERSION}.tar.gz"
+BSDTAR_TARBALL="libarchive-${BSDTAR_VERSION}.tar.xz"
 BSDTAR_DOWNLOADED=false
 for mirror in "${BSDTAR_MIRRORS[@]}"; do
   echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
@@ -67,7 +67,7 @@ for mirror in "${BSDTAR_MIRRORS[@]}"; do
   fi
 done
 if [ "${BSDTAR_DOWNLOADED}" = false ]; then
-  echo -e "${TOMATO}= ERROR: all mirrors failed for libarchive-${BSDTAR_VERSION}.tar.gz${NC}"
+  echo -e "${TOMATO}= ERROR: all mirrors failed for libarchive-${BSDTAR_VERSION}.tar.xz${NC}"
   exit 1
 fi
 
@@ -81,8 +81,8 @@ echo -e "${PEACH}= copy resolv.conf and libarchive tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 cp "${BSDTAR_TARBALL}" "./pasta/${BSDTAR_TARBALL}"
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi
@@ -93,69 +93,62 @@ sudo mount --rbind /dev "./pasta/dev/"
 sudo mount --rbind /sys "./pasta/sys/"
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
-wget \
+clang \
 make \
 pkgconfig \
-clang \
 git \
-xz-dev \
-libintl \
-libbsd-static \
-xz-libs \
-zlib \
-zlib-static \
-libselinux-dev \
-libssl3 \
-libbsd \
-libbsd-dev \
-gettext-libs \
-gettext-static \
-gettext-dev \
-gettext \
-python3 \
-openssl-misc \
-openssl-libs-static \
-openssl \
-zlib-dev \
-xz-static \
-openssl-dev \
 automake \
+autoconf \
 libtool \
 bison \
 flex \
+python3 \
+perl \
+wget \
+texinfo \
 gettext \
-autoconf \
-gettext \
+gettext-dev \
+gettext-static \
+gettext-libs \
+xz-dev \
+xz-static \
+xz-libs \
+zlib \
+zlib-dev \
+zlib-static \
+zlib-ng \
+zlib-ng-dev \
+bzip2-dev \
+bzip2-static \
+lz4-dev \
+lz4-static \
+zstd-dev \
+zstd-static \
+openssl \
+openssl-dev \
+openssl-libs-static \
+openssl-misc \
+libssl3 \
+libintl \
+libbsd \
+libbsd-dev \
+libbsd-static \
+libselinux-dev \
 sqlite \
 sqlite-dev \
 pcre-dev \
-wget \
-texinfo \
-docbook-xsl \
-libxslt \
-docbook2x \
-gettext-dev \
-gettext-static \
-bzip2-dev \
-bzip2-static \
-autoconf \
-automake \
 libxml2 \
 libxml2-dev \
 libxml2-static \
-zstd-dev \
-zstd-static \
-lz4-dev \
-lz4-static \
-zlib-ng-dev \
-zlib-ng \
-upx \
-perl && \
-tar xf libarchive-${BSDTAR_VERSION}.tar.gz && \
+docbook-xsl \
+libxslt \
+docbook2x \
+upx && \
+tar xf libarchive-${BSDTAR_VERSION}.tar.xz && \
 cd libarchive-${BSDTAR_VERSION}/ && \
 ./configure CC=gcc --disable-shared --enable-bsdtar=static --disable-bsdcat --disable-bsdcpio --with-zlib --without-bz2lib --disable-maintainer-mode --disable-dependency-tracking LDFLAGS='-static' CFLAGS='-Os -no-pie' && \
 LDFLAGS='-static' make -j\$(nproc) && \
-gcc -static -o bsdtar tar/bsdtar-bsdtar.o tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a -lz -llzma -lzstd -lxml2 -lcrypto -lssl
+gcc -static -o bsdtar tar/bsdtar-bsdtar.o tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a -lz -llzma -lzstd -lxml2 -lcrypto -lssl && \
 strip bsdtar && \
 upx --lzma bsdtar"
 mkdir -p dist

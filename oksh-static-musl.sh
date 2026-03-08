@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-set -x
 
 ORANGE="\033[38;2;255;165;0m"
 LEMON="\033[38;2;255;244;79m"
@@ -20,7 +19,7 @@ ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 
 OKSH_MIRRORS=(
   "https://github.com/ibara/oksh/releases/download/oksh-${OKSH_VERSION}/oksh-${OKSH_VERSION}.tar.gz"
-  "https://github.com/ibara/oksh/releases/download/oksh-${OKSH_VERSION}/oksh-${OKSH_VERSION}.tar.gz"
+  "https://distfiles.alpinelinux.org/distfiles/v3.23/oksh-${OKSH_VERSION}.tar.gz"
 )
 
 case "${ARCH}" in
@@ -79,8 +78,8 @@ echo -e "${PEACH}= copy resolv.conf and oksh tarball into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
 cp "${OKSH_TARBALL}" "./pasta/${OKSH_TARBALL}"
 
-echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
 if [ -n "${QEMU_ARCH}" ]; then
+  echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
   sudo mkdir -p "./pasta/usr/bin/"
   sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
 fi
