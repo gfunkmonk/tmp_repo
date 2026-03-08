@@ -103,7 +103,7 @@ tar xf xz-${XZ_VERSION}.tar.xz && \
 cd xz-${XZ_VERSION}/ && \
 ./configure CC=clang \
   --enable-static --disable-shared --disable-nls \
-  LDFLAGS='-static -Wl,--gc-sections' \
+  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization' && \
 CC=clang LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
 strip src/xz/xz && \

@@ -125,6 +125,7 @@ patch -p1 --fuzz=4 < ../mega.patch && \
 autoreconf -f -i && \
 ./configure --enable-static \
   LDFLAGS='-static' \
+  PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -no-pie -fomit-frame-pointer -fstack-clash-protection' \
   CXXFLAGS='-fno-delete-null-pointer-checks -fno-schedule-insns2' && \
 make -j\$(nproc) && \

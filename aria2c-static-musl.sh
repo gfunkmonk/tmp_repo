@@ -74,7 +74,7 @@ for mirror in "${ARIA2_MIRRORS[@]}"; do
     ARIA2_DOWNLOADED=true
     break
   else
-    echo -e "${TOMATO}= failed: ${mirror}${NC}"
+    echo -e "${LEMON}= failed: ${mirror}${NC}"
     rm -f "${ARIA2_TARBALL}"
   fi
 done

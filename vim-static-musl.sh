@@ -116,7 +116,8 @@ sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
   --disable-sysmouse --disable-xsmp \
   --enable-multibyte \
   --with-features=huge --with-tlib=ncursesw --without-x \
-  LDFLAGS='-static' CFLAGS='-Os -static -fno-stack-protector -no-pie' && \
+  LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -static -fno-stack-protector -no-pie' && \
 CC='gcc' make -j\$(nproc) && \
 strip src/vim && \
 if [ ! -f "vim-${VIM_VERSION}/src/vim" ]; then
