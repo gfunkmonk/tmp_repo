@@ -75,7 +75,7 @@ echo -e "${VIOLET}= mount, bind and chroot into dir${NC}"
 sudo mount -t proc none ./pasta/proc/
 sudo mount --rbind /dev ./pasta/dev/
 sudo mount --rbind /sys ./pasta/sys/
-sudo chroot ./pasta/ /bin/sh -c "apk update && apk add build-base \
+sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 openssl-dev \
 openssl-libs-static \

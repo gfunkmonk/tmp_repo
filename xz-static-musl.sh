@@ -137,7 +137,7 @@ upx && \
 tar xf xz-${XZ_VERSION}.tar.xz && \
 cd xz-${XZ_VERSION}/ && \
 ./configure CC=clang --enable-static --disable-shared --disable-nls LDFLAGS='-static -Wl,--gc-sections -ffunction-sections -fdata-sections' CFLAGS='-Os -Wno-unterminated-string-initialization' && \
-CC=clang LDFLAGS='--static -Wl,--gc-sections -ffunction-sections -fdata-sections' make -j\$(nproc) && \
+CC=clang LDFLAGS='-static -Wl,--gc-sections -ffunction-sections -fdata-sections' make -j\$(nproc) && \
 strip src/xz/xz && \
 if [ ! -f "./pasta/xz-${XZ_VERSION}/src/xz/xz" ]; then
   echo -e "${TOMATO}Error: xz binary not found after build${NC}" >&2

@@ -70,7 +70,7 @@ for mirror in "${CURL_MIRRORS[@]}"; do
   fi
 done
 if [ "${CURL_DOWNLOADED}" = false ]; then
-  echo -e "${TOMATO}= ERROR: all mirrors failed for curl-${CURL_VERSION}.tar.gz${NC}"
+  echo -e "${TOMATO}= ERROR: all mirrors failed for curl-${CURL_VERSION}.tar.xz${NC}"
   exit 1
 fi
 
