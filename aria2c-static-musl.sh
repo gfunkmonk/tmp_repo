@@ -165,6 +165,8 @@ sqlite-static \
 libxml2-dev \
 libxml2-static \
 util-linux-static \
+xz-dev \
+xz-static \
 curl \
 patch \
 pkgconfig \
