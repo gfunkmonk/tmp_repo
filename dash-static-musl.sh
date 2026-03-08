@@ -166,7 +166,7 @@ autoreconf -f -i && \
   CXXFLAGS='-fno-delete-null-pointer-checks -fno-schedule-insns2' && \
 make -j\$(nproc) && \
 strip src/dash && \
-if [ ! -f "dash-${DASH_VERSION}/src/dash" ]; then
+if [ ! -f "src/dash" ]; then
   echo -e "${TOMATO}Error: dash binary not found after build${NC}" >&2
   exit 1
 fi

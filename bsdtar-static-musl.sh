@@ -155,7 +155,7 @@ cd libarchive-${BSDTAR_VERSION}/ && \
 make -j\$(nproc) && \
 gcc -static -o bsdtar tar/bsdtar-bsdtar.o tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a -lz -llzma -lzstd -lxml2 -lcrypto -lssl && \
 strip bsdtar && \
-if [ ! -f "libarchive-${BSDTAR_VERSION}/bsdtar" ]; then
+if [ ! -f "bsdtar" ]; then
   echo -e "${TOMATO}Error: bsdtar binary not found after build${NC}" >&2
   exit 1
 fi
