@@ -57,9 +57,8 @@ cd aria2-${ARIA2_VERSION}/ && \
 patch -p1 --fuzz=4 < ../aria2-1.37.0.patch && \
 ./configure CC=gcc ARIA2_STATIC=yes \
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
-  --without-gnutls --with-openssl \
-  --disable-bittorrent \
-  --with-libcares --with-sqlite3 \
+  --without-gnutls --with-openssl --with-libcares \
+  --disable-bittorrent --with-sqlite3 \
   --enable-shared=no --enable-static --disable-shared \
   LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -Wno-unterminated-string-initialization' && \

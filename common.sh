@@ -15,6 +15,9 @@ LAGOON="\033[38;2;142;235;236m"
 HOTPINK="\033[38;2;255;105;180m"
 LIME="\033[38;2;204;255;0m"
 OCHRE="\033[38;2;204;119;34m"
+SLATE="\033[38;2;109;129;150m"
+SKY="\033[38;2;135;206;250m"
+JUNEBUD="\033[38;2;189;218;87m"
 NC="\033[0m"
 
 ARCH=${ARCH:-x86_64}
@@ -62,7 +65,7 @@ download_source() {
   local label="$1" version="$2" tarball="$3"
   shift 3
   if [ -f "${tarball}" ]; then
-    echo -e "${MINT}= ${label}-${version}: ${tarball} already cached, skipping download${NC}"
+    echo -e "${SLATE}= ${label}-${version}: ${tarball} already cached, skipping download${NC}"
     return 0
   fi
   echo -e "${AQUA}= downloading ${label}-${version} tarball${NC}"
@@ -91,7 +94,7 @@ setup_alpine_chroot() {
   local tarball="$1"
   echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
   wget -c "${ALPINE_URL}"
-  echo -e "${MINT}= extract rootfs${NC}"
+  echo -e "${SKY}= extract rootfs${NC}"
   mkdir -p pasta
   tar xf "${TARBALL}" -C pasta/
   echo -e "${PEACH}= copy resolv.conf and ${tarball} into chroot${NC}"
@@ -114,7 +117,7 @@ copy_patches() {
 # setup_qemu: copy qemu static binary into chroot for cross-arch builds
 setup_qemu() {
   if [ -n "${QEMU_ARCH}" ]; then
-    echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
+    echo -e "${OCHRE}= setup QEMU for cross-arch builds${NC}"
     sudo mkdir -p "./pasta/usr/bin/"
     sudo cp "/usr/bin/qemu-${QEMU_ARCH}-static" "./pasta/usr/bin/"
   fi
@@ -138,5 +141,5 @@ package_output() {
     echo -e "${ORANGE} File Info:  $(file "dist/${tool}-${ARCH}" | cut -d: -f2-)${NC}"
   fi
   tar -C dist -cJf "dist/${tool}-${ARCH}.tar.xz" "${tool}-${ARCH}"
-  echo -e "${LEMON}= All done! Binary: dist/${tool}-${ARCH} ($(du -sh "dist/${tool}-${ARCH}" | cut -f1))${NC}"
+  echo -e "${JUNEBUD}= All done! Binary: dist/${tool}-${ARCH} ($(du -sh "dist/${tool}-${ARCH}" | cut -f1))${NC}"
 }
