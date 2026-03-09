@@ -56,7 +56,8 @@ autoreconf -i -f && \
 ./configure CC=gcc LIBS='-l:libreadline.a -l:libncursesw.a' \
   --with-openssl --without-gnutls --enable-static --enable-threads=posix --disable-nls --disable-shared
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-std=c17 -Os -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization -Wno-deprecated-declarations' && \
+  CFLAGS='-std=c17 -Os -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization -Wno-deprecated-declarations' \
+  CXXFLAGS='-std=c17 -Wall -Werror -Wno-error=template-id-cdtor' && \
 CC=gcc LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
 strip src/lftp && \
 ../upx --best src/lftp"
