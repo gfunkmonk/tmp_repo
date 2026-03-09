@@ -44,7 +44,7 @@ jobs:
         id: set-matrix
         run: |
           if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.tool }}" == "all" || "${{ inputs.tool }}" == "" ]]; then
-            echo 'matrix=["aria2c","axel","bsdtar","curl","dash","nano","oksh","tar","vim","wget","xz"]' >> "$GITHUB_OUTPUT"
+            echo 'matrix=["aria2c","axel","bsdtar","curl","dash","lftp","nano","oksh","tar","vim","wget","xz"]' >> "$GITHUB_OUTPUT"
           else
             echo 'matrix=["${{ inputs.tool }}"]' >> "$GITHUB_OUTPUT"
           fi
