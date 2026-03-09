@@ -54,8 +54,8 @@ cd lftp-${LFTP_VERSION}/ && \
 patch -p1 --fuzz=4 < ../lftp-4.9.3.patch && \
 autoreconf -i -f && \
 ./configure CC=gcc LIBS='-l:libreadline.a -l:libncursesw.a' \
-  --with-openssl --without-gnutls --enable-static --enable-threads=posix --disable-nls --disable-shared
-  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  --with-openssl --without-gnutls --enable-static --enable-threads=posix --disable-nls --disable-shared \
+  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' CXXFLAGS='-Wno-error=template-id-cdto' \
   CFLAGS='-std=c17 -Os -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization -Wno-deprecated-declarations -Wno-error=template-id-cdtor' && \
 CC=gcc LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
 strip src/lftp && \
