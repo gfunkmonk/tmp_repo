@@ -6,6 +6,7 @@ BASH_VERSION="5.3"
 BASH_TARBALL="bash-${BASH_VERSION}.tar.gz"
 BASH_PATCH_PREFIX="bash${BASH_VERSION//./}"
 BASH_PATCH_URL="https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}-patches/"
+BASH_PATCH_PROBE_MAX=120
 BASH_MIRRORS=(
   "https://ftp.gnu.org/gnu/bash/${BASH_TARBALL}"
   "https://mirrors.ocf.berkeley.edu/gnu/bash/${BASH_TARBALL}"
@@ -23,7 +24,7 @@ fetch_bash_patches() {
   if [ ${#BASH_OFFICIAL_PATCHES[@]} -eq 0 ]; then
     echo -e "${LEMON}= directory listing empty, probing sequential patches${NC}"
     local candidate
-    for num in $(seq -w 1 120); do
+    for num in $(seq -w 1 ${BASH_PATCH_PROBE_MAX}); do
       candidate="${BASH_PATCH_PREFIX}-${num}"
       if curl -sfI --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 "${BASH_PATCH_URL}${candidate}" >/dev/null; then
         BASH_OFFICIAL_PATCHES+=("${candidate}")
