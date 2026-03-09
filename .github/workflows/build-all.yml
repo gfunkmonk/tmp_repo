@@ -6,15 +6,6 @@ on:
     - cron: "0 0 */6 * *"
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
-      tools:
-        description: "Tools to build — comma-separated or 'all' (aria2c,axel,bsdtar,curl,dash,oksh,tar,vim,wget,xz)"
-        required: false
-        default: "all"
-      archs:
-        description: "Architectures to build — comma-separated or 'all' (x86_64,x86,aarch64,armv7)"
-        required: false
-        default: "all"
 
 env:
   ALPINE_VERSION: "3.23.3"
@@ -23,45 +14,13 @@ permissions:
   contents: read
 
 jobs:
-  # Resolve which tools and archs to build, outputting JSON arrays for the matrix.
-  # Scheduled runs and 'all' inputs always produce the full lists.
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      tools: ${{ steps.matrix.outputs.tools }}
-      archs: ${{ steps.matrix.outputs.archs }}
-    steps:
-    - name: Resolve matrix
-      id: matrix
-      run: |
-        ALL_TOOLS='["aria2c","axel","bsdtar","curl","dash","oksh","tar","vim","wget","xz"]'
-        ALL_ARCHS='["x86_64","x86","aarch64","armv7"]'
-
-        TOOLS_INPUT="${{ github.event.inputs.tools }}"
-        ARCHS_INPUT="${{ github.event.inputs.archs }}"
-
-        if [ -z "${TOOLS_INPUT}" ] || [ "${TOOLS_INPUT}" = "all" ]; then
-          echo "tools=${ALL_TOOLS}" >> "$GITHUB_OUTPUT"
-        else
-          JSON=$(echo "${TOOLS_INPUT}" | tr -d ' ' | tr ',' '\n' | jq -R . | jq -sc .)
-          echo "tools=${JSON}" >> "$GITHUB_OUTPUT"
-        fi
-
-        if [ -z "${ARCHS_INPUT}" ] || [ "${ARCHS_INPUT}" = "all" ]; then
-          echo "archs=${ALL_ARCHS}" >> "$GITHUB_OUTPUT"
-        else
-          JSON=$(echo "${ARCHS_INPUT}" | tr -d ' ' | tr ',' '\n' | jq -R . | jq -sc .)
-          echo "archs=${JSON}" >> "$GITHUB_OUTPUT"
-        fi
-
   build:
-    needs: setup
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        tool: ${{ fromJson(needs.setup.outputs.tools) }}
-        arch: ${{ fromJson(needs.setup.outputs.archs) }}
+        tool: [aria2c, axel, bsdtar, curl, dash, oksh, tar, vim, wget, xz]
+        arch: [x86_64, x86, aarch64, armv7]
 
     steps:
     - uses: actions/checkout@v4
