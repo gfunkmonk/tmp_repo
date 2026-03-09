@@ -11,6 +11,7 @@ Build scripts that produce fully static, multi-architecture binaries using musl 
 | bsdtar | 3.8.5 | Archive tool (libarchive) |
 | curl | 8.18.0 | Data transfer tool |
 | dash | 0.5.13.1 | POSIX shell |
+| lftp | 4.9.3 | Command line ftp client |
 | oksh | 7.8 | OpenBSD ksh shell |
 | tar | 1.35 | GNU tar archive utility |
 | vim | 9.2.0119 | Text editor |
