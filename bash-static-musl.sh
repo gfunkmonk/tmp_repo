@@ -44,7 +44,7 @@ download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
 download_bash_upstream_patches
 setup_alpine_chroot "${BASH_TARBALL}"
 cp -r "${BASH_PATCH_DIR}" ./pasta/
-copy_patches "bash-5.3.patch"
+copy_patches "bash-5.3_my.patch"
 setup_qemu
 mount_chroot
 
@@ -76,7 +76,7 @@ chmod 755 upx && \
 tar xf ${BASH_TARBALL} && \
 cd bash-${BASH_VERSION}/ && \
 for patch in ../${BASH_PATCH_DIR}/${BASH_PATCH_PREFIX}*; do patch -p0 < "${patch}"; done && \
-patch -p1 --fuzz=4 < ../bash-5.3.patch && \
+patch -p1 --fuzz=4 < ../bash-5.3_my.patch && \
 ./configure CC='gcc' \
   --disable-nls --without-bash-malloc --with-curses --enable-static-link \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
