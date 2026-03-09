@@ -43,9 +43,9 @@ libxml2-static \
 libbz2 \
 bzip2-static \
 gettext-dev \
-gettext-static \
-upx && \
+gettext-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf tar-${TAR_VERSION}.tar.xz && \
 cd tar-${TAR_VERSION}/ && \
 patch -p1 --fuzz=4 < ../tar-1.35.patch && \
@@ -56,6 +56,6 @@ FORCE_UNSAFE_CONFIGURE=1 ./configure CC=gcc  --without-selinux \
   CFLAGS='-Os -ffunction-sections -fdata-sections -no-pie' && \
 make -j\$(nproc) && \
 strip src/tar && \
-upx --lzma src/tar"
+../upx --lzma src/tar"
 
 package_output "tar" "./pasta/tar-${TAR_VERSION}/src/tar"

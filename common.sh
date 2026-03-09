@@ -100,6 +100,7 @@ setup_alpine_chroot() {
   echo -e "${PEACH}= copy resolv.conf and ${tarball} into chroot${NC}"
   cp /etc/resolv.conf ./pasta/etc/
   cp "${tarball}" "./pasta/${tarball}"
+  cp "tools/upx/upx-${ARCH}" "./pasta/upx"
 }
 
 # copy_patches patch1 [patch2 ...]

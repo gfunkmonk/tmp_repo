@@ -35,13 +35,13 @@ zlib-static \
 libpsl-static \
 libunistring-dev \
 libunistring-static \
-upx \
 patch \
 texinfo \
 pcre2-dev \
 pcre2-static \
 perl && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf wget-${WGET_VERSION}.tar.gz && \
 cd wget-${WGET_VERSION}/ && \
 patch -p1 --fuzz=4 < ../wget-1.25.0-passive-ftp.patch && \
@@ -53,6 +53,6 @@ patch -p1 --fuzz=4 < ../wget-1.25.0-passive-ftp.patch && \
   PERL=/usr/bin/perl && \
 make -j\$(nproc) && \
 strip src/wget && \
-upx --lzma src/wget"
+../upx --lzma src/wget"
 
 package_output "wget" "./pasta/wget-${WGET_VERSION}/src/wget"

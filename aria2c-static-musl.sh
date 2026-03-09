@@ -51,9 +51,9 @@ xz-dev \
 xz-static \
 curl \
 patch \
-pkgconfig \
-upx && \
+pkgconfig && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf aria2-${ARIA2_VERSION}.tar.gz && \
 cd aria2-${ARIA2_VERSION}/ && \
 patch -p1 --fuzz=4 < ../aria2-1.37.0.patch && \
@@ -66,6 +66,6 @@ patch -p1 --fuzz=4 < ../aria2-1.37.0.patch && \
   CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip src/aria2c && \
-upx --lzma src/aria2c"
+../upx --lzma src/aria2c"
 
 package_output "aria2c" "./pasta/aria2-${ARIA2_VERSION}/src/aria2c"

@@ -35,9 +35,9 @@ libedit-static \
 ncurses-dev \
 ncurses-static \
 autoconf \
-patch \
-upx && \
+patch && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf oksh-${OKSH_VERSION}.tar.gz && \
 cd oksh-${OKSH_VERSION}/ && \
 ./configure --cc=gcc --cflags=\"-Os -fomit-frame-pointer\" \
@@ -45,6 +45,6 @@ cd oksh-${OKSH_VERSION}/ && \
   LDFLAGS='-static' PKG_CONFIG='pkg-config --static' && \
 make -j\$(nproc) && \
 strip oksh && \
-upx --ultra-brute oksh"
+../upx --ultra-brute oksh"
 
 package_output "oksh" "./pasta/oksh-${OKSH_VERSION}/oksh"

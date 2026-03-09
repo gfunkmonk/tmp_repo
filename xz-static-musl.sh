@@ -24,9 +24,9 @@ musl-dev \
 ccache \
 clang \
 make \
-pkgconfig \
-upx && \
+pkgconfig && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf xz-${XZ_VERSION}.tar.xz && \
 cd xz-${XZ_VERSION}/ && \
 ./configure CC=clang \
@@ -35,6 +35,6 @@ cd xz-${XZ_VERSION}/ && \
   CFLAGS='-Os -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization' && \
 CC=clang LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
 strip src/xz/xz && \
-upx --lzma src/xz/xz"
+../upx --lzma src/xz/xz"
 
 package_output "xz" "./pasta/xz-${XZ_VERSION}/src/xz/xz"

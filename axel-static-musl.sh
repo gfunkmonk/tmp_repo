@@ -33,15 +33,15 @@ openssl-libs-static \
 zlib-static \
 libpsl-static \
 libunistring-dev \
-libunistring-static \
-upx && \
+libunistring-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf axel-${AXEL_VERSION}.tar.xz && \
 cd axel-${AXEL_VERSION}/ && \
 ./configure CC=gcc LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip axel && \
-upx --lzma axel"
+../upx --lzma axel"
 
 package_output "axel" "./pasta/axel-${AXEL_VERSION}/axel"

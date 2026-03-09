@@ -34,9 +34,9 @@ zlib-dev \
 zlib-static \
 zstd-dev \
 zstd-static \
-clang \
-upx && \
+clang && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf curl-${CURL_VERSION}.tar.xz && \
 cd curl-${CURL_VERSION}/ && \
 ./configure \
@@ -48,6 +48,6 @@ cd curl-${CURL_VERSION}/ && \
   CFLAGS='-Os -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) V=1 LDFLAGS='-static -all-static' && \
 strip src/curl && \
-upx --lzma src/curl"
+../upx --lzma src/curl"
 
 package_output "curl" "./pasta/curl-${CURL_VERSION}/src/curl"

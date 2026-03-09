@@ -37,9 +37,9 @@ lz4-static \
 openssl-dev \
 openssl-libs-static \
 libxml2-dev \
-libxml2-static \
-upx && \
+libxml2-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf libarchive-${BSDTAR_VERSION}.tar.xz && \
 cd libarchive-${BSDTAR_VERSION}/ && \
 ./configure CC=gcc \
@@ -57,6 +57,6 @@ gcc -static -o bsdtar tar/bsdtar-bsdtar.o \
   tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a \
   -lz -llzma -lzstd -llz4 -lxml2 -lcrypto -lssl && \
 strip bsdtar && \
-upx --lzma bsdtar"
+../upx --lzma bsdtar"
 
 package_output "bsdtar" "./pasta/libarchive-${BSDTAR_VERSION}/bsdtar"

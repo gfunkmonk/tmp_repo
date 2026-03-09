@@ -39,9 +39,9 @@ ncurses-static \
 autoconf \
 patch \
 libedit-dev \
-libedit-static \
-upx && \
+libedit-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf dash-${DASH_VERSION}.tar.gz && \
 cd dash-${DASH_VERSION}/ && \
 patch -p1 --fuzz=4 < ../dash-0.5.13.1.patch && \
@@ -53,6 +53,6 @@ autoreconf -f -i && \
   CXXFLAGS='-fno-delete-null-pointer-checks -fno-schedule-insns2' && \
 make -j\$(nproc) && \
 strip src/dash && \
-upx --lzma src/dash"
+../upx --lzma src/dash"
 
 package_output "dash" "./pasta/dash-${DASH_VERSION}/src/dash"

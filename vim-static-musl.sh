@@ -26,11 +26,11 @@ gcc \
 pkgconfig \
 ncurses-dev \
 ncurses-static \
-upx \
 python3-dev \
 perl-dev \
 perl && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+chmod 755 upx && \
 tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \
 sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
@@ -44,6 +44,6 @@ sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
   CFLAGS='-Os -static -fno-stack-protector -no-pie' && \
 CC='gcc' make -j\$(nproc) && \
 strip src/vim && \
-upx --ultra-brute src/vim"
+../upx --ultra-brute src/vim"
 
 package_output "vim" "./pasta/vim-${VIM_VERSION}/src/vim"
