@@ -79,7 +79,7 @@ chmod 755 upx
 tar xf ${BASH_TARBALL}
 cd bash-${BASH_VERSION}/
 while read -r patch; do
-  echo "= applying \$patch"
+  echo -e "${NAVAJO}= applying \$patch${NC}"
   patch -p0 < ../${BASH_PATCH_DIR}/"\$patch"
 done < ../${BASH_PATCH_DIR}/.patch-list
 patch -p1 --fuzz=4 < ../bash-5.3_my.patch
