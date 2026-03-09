@@ -24,6 +24,8 @@ mount_chroot
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 make \
+automake \
+autoconf \
 pkgconfig \
 zlib-dev \
 zlib-static \
