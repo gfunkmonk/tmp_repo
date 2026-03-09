@@ -42,7 +42,7 @@ bzip2-static \
 upx && \
 tar xf tar-${TAR_VERSION}.tar.xz && \
 cd tar-${TAR_VERSION}/ && \
-patch -p1 < ../tar-1.35.patch && \
+patch -p1 --fuzz=4 < ../tar-1.35.patch && \
 autoreconf -f -i && \
 FORCE_UNSAFE_CONFIGURE=1 ./configure CC=gcc  --without-selinux \
   --disable-nls --disable-rpath --enable-largefile \

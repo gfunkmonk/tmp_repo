@@ -54,7 +54,7 @@ pkgconfig \
 upx && \
 tar xf aria2-${ARIA2_VERSION}.tar.gz && \
 cd aria2-${ARIA2_VERSION}/ && \
-patch -p1 < ../aria2-1.37.0.patch && \
+patch -p1 --fuzz=4 < ../aria2-1.37.0.patch && \
 ./configure CC=gcc ARIA2_STATIC=yes \
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
   --without-gnutls --with-openssl \

@@ -42,7 +42,7 @@ pcre2-static \
 perl && \
 tar xf wget-${WGET_VERSION}.tar.gz && \
 cd wget-${WGET_VERSION}/ && \
-patch -p1 < ../wget-1.25.0-passive-ftp.patch && \
+patch -p1 --fuzz=4 < ../wget-1.25.0-passive-ftp.patch && \
 ./configure CC=gcc --with-ssl=openssl --with-libidn --disable-nls \
   --disable-rpath --sysconfdir=/etc \
   LDFLAGS='-static -lidn2 -lunistring' \
