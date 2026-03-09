@@ -20,6 +20,7 @@ on:
           - bsdtar
           - curl
           - dash
+          - lftp
           - nano
           - oksh
           - tar
