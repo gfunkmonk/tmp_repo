@@ -59,7 +59,7 @@ autoreconf -i -f && \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-std=c17 -Os -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization -Wno-deprecated-declarations' \
   CXXFLAGS='-std=c++14 -Os -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-deprecated-declarations -Wno-error=template-id-cdtor' && \
-CC=gcc CXX=g++ LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
+make -j\$(nproc) LDFLAGS='-static -all-static -Wl,--gc-sections' && \
 strip src/lftp && \
 ../upx --lzma src/lftp"
 
