@@ -23,6 +23,7 @@ mount_chroot
 
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
+ccache \
 openssl-dev \
 openssl-libs-static \
 nghttp2-dev \
@@ -35,6 +36,7 @@ zstd-dev \
 zstd-static \
 clang \
 upx && \
+mkdir -p /ccache && export CCACHE_DIR=/ccache CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 tar xf curl-${CURL_VERSION}.tar.xz && \
 cd curl-${CURL_VERSION}/ && \
 ./configure \

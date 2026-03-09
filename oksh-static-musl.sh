@@ -19,6 +19,7 @@ mount_chroot
 
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
+ccache \
 make \
 automake \
 clang \
@@ -36,6 +37,7 @@ ncurses-static \
 autoconf \
 patch \
 upx && \
+mkdir -p /ccache && export CCACHE_DIR=/ccache CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 tar xf oksh-${OKSH_VERSION}.tar.gz && \
 cd oksh-${OKSH_VERSION}/ && \
 ./configure --cc=gcc --cflags=\"-Os -fomit-frame-pointer\" \

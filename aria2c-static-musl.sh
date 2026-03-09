@@ -31,6 +31,7 @@ mount_chroot
 
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
+ccache \
 openssl-dev \
 openssl-libs-static \
 zlib-dev \
@@ -52,6 +53,7 @@ curl \
 patch \
 pkgconfig \
 upx && \
+mkdir -p /ccache && export CCACHE_DIR=/ccache CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 tar xf aria2-${ARIA2_VERSION}.tar.gz && \
 cd aria2-${ARIA2_VERSION}/ && \
 patch -p1 --fuzz=4 < ../aria2-1.37.0.patch && \

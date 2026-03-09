@@ -19,6 +19,7 @@ mount_chroot
 
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
+ccache \
 sed \
 make \
 gcc \
@@ -29,6 +30,7 @@ upx \
 python3-dev \
 perl-dev \
 perl && \
+mkdir -p /ccache && export CCACHE_DIR=/ccache CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \
 sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
