@@ -1,0 +1,434 @@
+From: Chris Lamb <lamby@debian.org>
+Date: Thu, 15 Feb 2018 20:28:25 +0000
+Subject: dash: Fix stack overflow from infinite recursion in script
+
+Bug-Debian: https://bugs.debian.org/579815
+Signed-off-by: Chris Lamb <lamby@debian.org>
+Signed-off-by: Andrej Shadura <andrew.shadura@collabora.co.uk>
+---
+ src/eval.c | 8 +++++++-
+ src/eval.h | 2 ++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/eval.c b/src/eval.c
+index fa43b68..fc291ba 100644
+--- a/src/eval.c
++++ b/src/eval.c
+@@ -71,6 +71,7 @@ int evalskip;			/* set if we are skipping commands */
+ STATIC int skipcount;		/* number of levels to skip */
+ MKINIT int loopnest;		/* current loop nesting level */
+ static int funcline;		/* starting line number of current function, or 0 if not in a function */
++static int evalcount;		/* number of nested evalfun calls */
+ 
+ 
+ char *commandname;
+@@ -914,7 +915,12 @@ raise:
+ 		break;
+ 
+ 	case CMDFUNCTION:
+-		if (evalfun(cmdentry.u.func, argc, argv, flags))
++		if (evalcount++ >= MAX_RECURSION)
++			sh_error("Maximum function recursion depth (%d) reached",
++			         MAX_RECURSION);
++		int i = evalfun(cmdentry.u.func, argc, argv, flags);
++		evalcount--;
++		if (i)
+ 			goto raise;
+ 		break;
+ 	}
+diff --git a/src/eval.h b/src/eval.h
+index 63e7d86..38dffbd 100644
+--- a/src/eval.h
++++ b/src/eval.h
+@@ -51,6 +51,8 @@ struct backcmd {		/* result of evalbackcmd */
+ #define EV_EXIT 01		/* exit after evaluating tree */
+ #define EV_TESTED 02		/* exit status is checked; ignore -e flag */
+ 
++#define MAX_RECURSION 1000	/* maximum recursion level */
++
+ int evalstring(char *, int);
+ union node;	/* BLETCH for ansi C */
+ int evaltree(union node *, int);
+From: You-Sheng Yang <vicamo@gmail.com>
+Date: Wed, 12 Dec 2018 14:02:40 +0800
+Subject: enable large file support when available
+
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 52aa429..648f3d4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -10,6 +10,8 @@ dnl Checks for programs.
+ AC_PROG_CC
+ AC_USE_SYSTEM_EXTENSIONS
+ 
++AC_SYS_LARGEFILE
++
+ AC_MSG_CHECKING([for build system compiler])
+ if test "$cross_compiling" = yes; then
+ 	CC_FOR_BUILD=${CC_FOR_BUILD-cc}
+From: 宇砂ワシ <usawashi16@yahoo.co.jp>
+Date: Sat, 27 Apr 2019 22:46:34 +0900
+Subject: histedit: Fix infinite loop when using 'fc -s'
+
+When compiling with libedit, he.num may somehow overrun last, causing
+an infinite loop when using fc -s.
+This mild change to the check plugs it.
+
+Bug-Debian: https://bugs.debian.org/928072
+---
+ src/histedit.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/histedit.c b/src/histedit.c
+index f5c90ab..aaac1c2 100644
+--- a/src/histedit.c
++++ b/src/histedit.c
+@@ -388,7 +388,7 @@ histcmd(int argc, char **argv)
+ 		 * At end?  (if we were to lose last, we'd sure be
+ 		 * messed up).
+ 		 */
+-		if (he.num == last)
++		if (he.num >= last)
+ 			break;
+ 	}
+ 	if (editor) {
+From: Tavis Ormandy <taviso@google.com>
+Date: Thu, 22 Aug 2013 10:59:36 -0700
+Subject: Implement privmode
+
+Author: Tavis Ormandy <taviso@google.com>
+Origin: https://www.openwall.com/lists/oss-security/2013/08/22/12
+Author: Harald van Dijk <harald@gigawatt.nl>
+Origin: https://www.openwall.com/lists/oss-security/2013/08/22/15
+
+Bug-Debian: https://bugs.debian.org/734869
+---
+ src/Makefile.am |  2 +-
+ src/dash.1      | 16 ++++++++++------
+ src/main.c      |  5 +++++
+ src/options.c   |  4 ++++
+ src/options.h   |  9 +++++----
+ src/priv.c      | 27 +++++++++++++++++++++++++++
+ src/priv.h      |  6 ++++++
+ src/var.c       | 26 ++++++++++++++++++++------
+ src/var.h       |  1 +
+ 9 files changed, 79 insertions(+), 17 deletions(-)
+ create mode 100644 src/priv.c
+ create mode 100644 src/priv.h
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 2c437bb..50d5a5b 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -20,7 +20,7 @@ bin_PROGRAMS = dash
+ dash_CFILES = \
+ 	alias.c arith_yacc.c arith_yylex.c cd.c error.c eval.c exec.c expand.c \
+ 	histedit.c input.c jobs.c mail.c main.c memalloc.c miscbltin.c \
+-	mystring.c options.c parser.c redir.c show.c trap.c output.c \
++	mystring.c options.c parser.c priv.c redir.c show.c trap.c output.c \
+ 	bltin/printf.c system.c bltin/test.c bltin/times.c var.c
+ dash_SOURCES = \
+ 	$(dash_CFILES) \
+diff --git a/src/dash.1 b/src/dash.1
+index bfdba70..299fb76 100644
+--- a/src/dash.1
++++ b/src/dash.1
+@@ -41,8 +41,8 @@
+ .Sh SYNOPSIS
+ .Nm
+ .Bk -words
+-.Op Fl aCefnuvxIimqVEb
+-.Op Cm +aCefnuvxIimqVEb
++.Op Fl aCefnuvxIimqVEbp
++.Op Cm +aCefnuvxIimqVEbp
+ .Ek
+ .Bk -words
+ .Op Fl o Ar option_name
+@@ -54,8 +54,8 @@
+ .Nm
+ .Fl c
+ .Bk -words
+-.Op Fl aCefnuvxIimqVEb
+-.Op Cm +aCefnuvxIimqVEb
++.Op Fl aCefnuvxIimqVEbp
++.Op Cm +aCefnuvxIimqVEbp
+ .Ek
+ .Bk -words
+ .Op Fl o Ar option_name
+@@ -68,8 +68,8 @@
+ .Nm
+ .Fl s
+ .Bk -words
+-.Op Fl aCefnuvxIimqVEb
+-.Op Cm +aCefnuvxIimqVEb
++.Op Fl aCefnuvxIimqVEbp
++.Op Cm +aCefnuvxIimqVEbp
+ .Ek
+ .Bk -words
+ .Op Fl o Ar option_name
+@@ -257,6 +257,10 @@ if it has been set).
+ .It Fl b Em notify
+ Enable asynchronous notification of background job completion.
+ (UNIMPLEMENTED for 4.4alpha)
++.It Fl p Em priviliged
++Do not attempt to reset effective uid if it does not match uid. This is not set
++by default to help avoid incorrect usage by setuid root programs via system(3) or
++popen(3).
+ .El
+ .Ss Lexical Structure
+ The shell reads input in terms of lines from a file and breaks it up into
+diff --git a/src/main.c b/src/main.c
+index 70df726..0001ea6 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -50,6 +50,7 @@
+ #include "eval.h"
+ #include "jobs.h"
+ #include "input.h"
++#include "priv.h"
+ #include "trap.h"
+ #include "var.h"
+ #include "show.h"
+@@ -98,6 +99,9 @@ main(int argc, char **argv)
+ 	dash_errno = __errno_location();
+ #endif
+ 
++	uid = getuid();
++	gid = getgid();
++
+ #if PROFILE
+ 	monitor(4, etext, profile_buf, sizeof profile_buf, 50);
+ #endif
+@@ -146,6 +150,7 @@ main(int argc, char **argv)
+ 	init();
+ 	setstackmark(&smark);
+ 	login = procargs(argc, argv);
++
+ 	if (login) {
+ 		state = 1;
+ 		read_profile("/etc/profile");
+diff --git a/src/options.c b/src/options.c
+index 93ad9d6..1b66cbe 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -45,6 +45,7 @@
+ #include "jobs.h"
+ #include "input.h"
+ #include "output.h"
++#include "priv.h"
+ #include "trap.h"
+ #include "var.h"
+ #include "memalloc.h"
+@@ -79,6 +80,7 @@ static const char *const optnames[NOPTS] = {
+ 	"allexport",
+ 	"notify",
+ 	"nounset",
++	"privileged",
+ 	"nolog",
+ 	"pipefail",
+ 	"debug",
+@@ -100,6 +102,7 @@ const char optletters[NOPTS] = {
+ 	'a',
+ 	'b',
+ 	'u',
++	'p',
+ 	0,
+ 	0,
+ 	0,
+@@ -183,6 +186,7 @@ optschanged(void)
+ #ifdef DEBUG
+ 	opentrace();
+ #endif
++	setprivileged(pflag);
+ 	setinteractive(iflag);
+ #ifndef SMALL
+ 	histedit();
+diff --git a/src/options.h b/src/options.h
+index f421316..1759823 100644
+--- a/src/options.h
++++ b/src/options.h
+@@ -59,11 +59,12 @@ struct shparam {
+ #define	aflag optlist[12]
+ #define	bflag optlist[13]
+ #define	uflag optlist[14]
+-#define	nolog optlist[15]
+-#define	pipefail optlist[16]
+-#define	debug optlist[17]
++#define	pflag optlist[15]
++#define	nolog optlist[16]
++#define	pipefail optlist[17]
++#define	debug optlist[18]
+ 
+-#define NOPTS	18
++#define NOPTS	19
+ 
+ extern const char optletters[NOPTS];
+ extern char optlist[NOPTS];
+diff --git a/src/priv.c b/src/priv.c
+new file mode 100644
+index 0000000..26346c0
+--- /dev/null
++++ b/src/priv.c
+@@ -0,0 +1,27 @@
++#include <unistd.h>
++
++#include "priv.h"
++#include "var.h"
++
++uid_t uid;
++gid_t gid;
++
++void setprivileged(int on)
++{
++	static int is_privileged = 1;
++	if (is_privileged == on)
++		return;
++
++	is_privileged = on;
++
++	/*
++	 * To limit bogus system(3) or popen(3) calls in setuid binaries, require
++	 * -p flag to work in this situation.
++	 */
++	if (!on && (uid != geteuid() || gid != getegid())) {
++		setuid(uid);
++		setgid(gid);
++		/* PS1 might need to be changed accordingly. */
++		choose_ps1();
++	}
++}
+diff --git a/src/priv.h b/src/priv.h
+new file mode 100644
+index 0000000..31b380b
+--- /dev/null
++++ b/src/priv.h
+@@ -0,0 +1,6 @@
++#include <unistd.h>
++
++extern uid_t uid;
++extern gid_t gid;
++
++void setprivileged(int on);
+diff --git a/src/var.c b/src/var.c
+index ef9c2bd..5326a80 100644
+--- a/src/var.c
++++ b/src/var.c
+@@ -81,6 +81,9 @@ MKINIT char defoptindvar[] = "OPTIND=1";
+ int lineno;
+ char linenovar[sizeof("LINENO=")+sizeof(int)*CHAR_BIT/3+1] = "LINENO=";
+ 
++const char defps1[] = "PS1=$ ";
++const char rootps1[] = "PS1=# ";
++
+ /* Some macros in var.h depend on the order, add new variables to the end. */
+ struct var varinit[] = {
+ #if ATTY
+@@ -90,7 +93,7 @@ struct var varinit[] = {
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"MAIL\0",	changemail },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED|VUNSET,	"MAILPATH\0",	changemail },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		defpathvar,	changepath },
+-	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS1=$ ",	0 },
++	{ 0,	VSTRFIXED|VTEXTFIXED,		defps1,	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS2=> ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		"PS4=+ ",	0 },
+ 	{ 0,	VSTRFIXED|VTEXTFIXED,		defoptindvar,	getoptsreset },
+@@ -174,11 +177,22 @@ initvar(void)
+ 		vp->next = *vpp;
+ 		*vpp = vp;
+ 	} while (++vp < end);
+-	/*
+-	 * PS1 depends on uid
+-	 */
+-	if (!geteuid())
+-		vps1.text = "PS1=# ";
++
++	choose_ps1();
++}
++
++/*
++ * Modify PS1 to reflect uid, unless an exported var exists.
++ */
++
++void
++choose_ps1(void)
++{
++	if (!geteuid()) {
++		vps1.text = rootps1;
++	} else {
++		vps1.text = defps1;
++	}
+ }
+ 
+ /*
+diff --git a/src/var.h b/src/var.h
+index aa7575a..4be3db1 100644
+--- a/src/var.h
++++ b/src/var.h
+@@ -135,6 +135,7 @@ extern char linenovar[];
+ #define mpathset()	((vmpath.flags & VUNSET) == 0)
+ 
+ void initvar(void);
++void choose_ps1(void);
+ struct var *setvar(const char *name, const char *val, int flags);
+ intmax_t setvarint(const char *, intmax_t, int);
+ struct var *setvareq(char *s, int flags);
+From 5139d6a27763fc0be386e15634db21e45598b299 Mon Sep 17 00:00:00 2001
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Tue, 21 Oct 2025 21:29:32 +0800
+Subject: shell: Fix unsigned char promotion and truncation
+
+When a char is promoted to an int, it needs to be signed as otherwise
+comparisons on it may fail.  Alternatively, an integer needs to be
+truncated to char before comparing it against another char.
+
+Reported-by: Juergen Daubert <j.daubert@posteo.de>
+Fixes: e878137f63e6 ("expand: Do not call rmescapes in expari")
+Fixes: c5bf9702ea11 ("expand: Add multi-byte support to pmatch")
+Fixes: 8f01c3796f0f ("[PARSER] Add FAKEEOFMARK for expandstr")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ src/expand.c | 4 ++--
+ src/parser.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/expand.c b/src/expand.c
+index 912384d..8c8bf0e 100644
+--- a/src/expand.c
++++ b/src/expand.c
+@@ -1914,7 +1914,7 @@ static int pmatch(char *pattern, const char *string)
+ 			if (c == '?' || c == '[')
+ 				c = CTLESC;
+ 			for (;;) {
+-				if (c != CTLESC) {
++				if (c != (char)CTLESC) {
+ 					/* Stop should be null-terminated
+ 					 * as it is passed as a string to
+ 					 * strpbrk(3).
+@@ -1985,7 +1985,7 @@ static int pmatch(char *pattern, const char *string)
+ 					p++;
+ 					if (*p == (char)CTLESC)
+ 						p++;
+-					else if (*p == CTLMBCHAR) {
++					else if (*p == (char)CTLMBCHAR) {
+ 						mbp = mbnext(p);
+ 						p += mbp & 0xff;
+ 						p += mbp >> 8;
+diff --git a/src/parser.c b/src/parser.c
+index eb402a7..5714958 100644
+--- a/src/parser.c
++++ b/src/parser.c
+@@ -1240,7 +1240,7 @@ checkend: {
+ 
+ 		markloc = out - (char *)stackblock();
+ 		for (p = eofmark; STPUTC(c, out), *p; p++) {
+-			if (c != *p)
++			if (c != (signed char)*p)
+ 				goto more_heredoc;
+ 
+ 			c = pgetc();
+-- 
+cgit 1.2.3-korg

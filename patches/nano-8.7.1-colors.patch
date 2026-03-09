@@ -1,0 +1,52 @@
+--- a/src/rcfile.c	2026-02-26 08:21:38.216350958 -0500
++++ b/src/rcfile.c	2026-02-26 08:44:58.081733693 -0500
+@@ -1023,7 +1023,7 @@
+ 		return (36 * level[red] + 6 * level[green] + level[blue] + 16);
+ }
+ 
+-#define COLORCOUNT  34
++#define COLORCOUNT  86
+ 
+ const char hues[COLORCOUNT][8] = { "red", "green", "blue",
+ 								   "yellow", "cyan", "magenta",
+@@ -1035,7 +1035,24 @@
+ 								   "sea", "sky", "slate",
+ 								   "teal", "sage", "brown",
+ 								   "ocher", "sand", "tawny",
+-								   "brick", "crimson",
++  								   "brick", "crimson", "steel",
++                                                                                  "aqua", "indigo", "olive",
++                                                                                  "grape", "vert", "maroon",
++                                                                                  "khaki", "silver", "amber",
++                                                                                  "tan", "hotpink", "salmon",
++                                                                                  "coral", "gold", "navajo",
++                                                                                  "lemon", "canary", "cream",
++                                                                                  "junebud", "camel", "violet",
++                                                                                  "cocoa", "royal", "lilac",
++                                                                                  "beige", "helio", "selago",
++                                                                                  "spring", "alarm", "azul",
++                                                                                  "banana", "scarlet", "carrot",
++                                                                                  "scampi", "unicorn", "piggy",
++                                                                                  "frog", "dodger", "frost",
++                                                                                  "voodoo", "tomato", "forest",
++                                                                                  "volt", "azure", "baby",
++                                                                                  "blood", "moss", "bitter",
++                                                                                  "boysen", "cuba", "citron",
+ 								   "grey", "gray" };
+ 
+ short indices[COLORCOUNT] = { COLOR_RED, COLOR_GREEN, COLOR_BLUE,
+@@ -1043,7 +1060,13 @@
+ 							  COLOR_WHITE, COLOR_BLACK, THE_DEFAULT,
+ 							  204, 163, 134, 38, 48, 148, 215, 208, 137,
+ 							  175, 127, 98, 32, 111, 66, 35, 107, 100,
+-							  142, 186, 136, 166, 161,
++							  142, 186, 136, 166, 161, 31, 50, 54, 64,
++                                                                       105, 118, 125, 143, 146, 178, 180, 206, 209,
++                                                                       210, 220, 223, 227, 228, 230, 149, 137, 93,
++                                                                       52, 26, 99, 138, 171, 225, 77, 160, 27,
++                                                                       226, 196, 214, 60, 201, 219, 106, 69, 123,
++                                                                       90, 202, 22, 190, 33, 153, 88, 101, 203, 89,
++                                                                       42, 142,
+ 							  COLOR_BLACK + 8, COLOR_BLACK + 8 };
+ 
+ /* Return the short value corresponding to the given color name, and set
