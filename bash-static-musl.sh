@@ -6,6 +6,7 @@ BASH_VERSION="5.3"
 BASH_TARBALL="bash-${BASH_VERSION}.tar.gz"
 BASH_PATCH_PREFIX="bash${BASH_VERSION//./}"
 BASH_PATCH_URL="https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}-patches/"
+# Upper bound for sequential patch probing; bash releases historically stay under 100 patches.
 BASH_PATCH_PROBE_MAX=120
 BASH_MIRRORS=(
   "https://ftp.gnu.org/gnu/bash/${BASH_TARBALL}"
@@ -37,9 +38,7 @@ fetch_bash_patches() {
     echo -e "${LEMON}= no upstream patches found for bash ${BASH_VERSION}${NC}"
     return 0
   fi
-  if [ ${#BASH_OFFICIAL_PATCHES[@]} -gt 1 ]; then
-    mapfile -t BASH_OFFICIAL_PATCHES < <(printf '%s\n' "${BASH_OFFICIAL_PATCHES[@]}" | sort -u)
-  fi
+  mapfile -t BASH_OFFICIAL_PATCHES < <(printf '%s\n' "${BASH_OFFICIAL_PATCHES[@]}" | sort -u)
   for patch_file in "${BASH_OFFICIAL_PATCHES[@]}"; do
     if [ -f "${patch_file}" ]; then
       echo -e "${SLATE}= ${patch_file} already cached, skipping download${NC}"
