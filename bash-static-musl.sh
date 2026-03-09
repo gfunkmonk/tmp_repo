@@ -21,9 +21,21 @@ fetch_bash_patches() {
   listing=$(curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 "${BASH_PATCH_URL}")
   mapfile -t BASH_OFFICIAL_PATCHES < <(echo "${listing}" | grep -oE "${BASH_PATCH_PREFIX}-[0-9]{3}" | sort -u)
   if [ ${#BASH_OFFICIAL_PATCHES[@]} -eq 0 ]; then
+    echo -e "${LEMON}= directory listing empty, probing sequential patches${NC}"
+    for num in $(seq -w 1 300); do
+      local candidate="${BASH_PATCH_PREFIX}-${num}"
+      if curl -sfI --retry 2 --retry-delay 1 --connect-timeout 5 --max-time 10 "${BASH_PATCH_URL}${candidate}" >/dev/null; then
+        BASH_OFFICIAL_PATCHES+=("${candidate}")
+      else
+        break
+      fi
+    done
+  fi
+  if [ ${#BASH_OFFICIAL_PATCHES[@]} -eq 0 ]; then
     echo -e "${LEMON}= no upstream patches found for bash ${BASH_VERSION}${NC}"
     return 0
   fi
+  mapfile -t BASH_OFFICIAL_PATCHES < <(printf '%s\n' "${BASH_OFFICIAL_PATCHES[@]}" | sort -u)
   for patch_file in "${BASH_OFFICIAL_PATCHES[@]}"; do
     if [ -f "${patch_file}" ]; then
       echo -e "${SLATE}= ${patch_file} already cached, skipping download${NC}"
