@@ -21,16 +21,21 @@ fetch_bash_patches() {
   echo -e "${AQUA}= fetching upstream bash ${BASH_VERSION} patches${NC}"
   local listing
   listing=$(curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 "${BASH_PATCH_URL}")
-  mapfile -t BASH_OFFICIAL_PATCHES < <(echo "${listing}" | grep -oE "${BASH_PATCH_PREFIX}-[0-9]{3}" | sort -u)
+  mapfile -t BASH_OFFICIAL_PATCHES < <(echo "${listing}" | grep -oE "${BASH_PATCH_PREFIX}-[0-9]{3}" | sort -uV)
   if [ ${#BASH_OFFICIAL_PATCHES[@]} -eq 0 ]; then
-    echo -e "${LEMON}= directory listing empty, probing sequential patches${NC}"
-    local candidate
+    echo -e "${LEMON}= directory listing empty, probing for sequential patches${NC}"
+    local candidate consecutive_fail=0
+    # Sequential probe is bounded (max ${BASH_PATCH_PROBE_MAX}, stops after 3 misses) to keep HEAD requests reasonable.
     for num in $(seq -w 1 "${BASH_PATCH_PROBE_MAX}"); do
       candidate="${BASH_PATCH_PREFIX}-${num}"
       if curl -sfI --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 "${BASH_PATCH_URL}${candidate}" >/dev/null; then
         BASH_OFFICIAL_PATCHES+=("${candidate}")
+        consecutive_fail=0
       else
-        break
+        consecutive_fail=$((consecutive_fail + 1))
+        if [ "${consecutive_fail}" -ge 3 ]; then
+          break
+        fi
       fi
     done
   fi
@@ -38,7 +43,7 @@ fetch_bash_patches() {
     echo -e "${LEMON}= no upstream patches found for bash ${BASH_VERSION}${NC}"
     return 0
   fi
-  mapfile -t BASH_OFFICIAL_PATCHES < <(printf '%s\n' "${BASH_OFFICIAL_PATCHES[@]}" | sort -u)
+  mapfile -t BASH_OFFICIAL_PATCHES < <(printf '%s\n' "${BASH_OFFICIAL_PATCHES[@]}" | sort -uV)
   for patch_file in "${BASH_OFFICIAL_PATCHES[@]}"; do
     if [ -f "${patch_file}" ]; then
       echo -e "${SLATE}= ${patch_file} already cached, skipping download${NC}"
