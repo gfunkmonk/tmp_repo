@@ -2,7 +2,15 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
-OKSH_VERSION="7.8"
+echo -e "${VIOLET}= fetching latest oksh version${NC}"
+OKSH_VERSION=$(curl -fsSL "https://api.github.com/repos/ibara/oksh/releases/latest" \
+  | grep '"tag_name"' | sed 's/.*"release-\([^"]*\)".*/\1/' \
+  | sed 's/  "tag_name": "oksh-//g' | sed 's/",//g') || true
+if [ -z "${OKSH_VERSION}" ]; then
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to oksh 7.8${NC}"
+  OKSH_VERSION="7.8"
+fi
+
 PACKAGE_VERSION="${OKSH_VERSION}"
 OKSH_TARBALL="oksh-${OKSH_VERSION}.tar.gz"
 OKSH_MIRRORS=(

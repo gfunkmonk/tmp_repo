@@ -2,7 +2,15 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
-CURL_VERSION="8.18.0"
+echo -e "${VIOLET}= fetching latest curl version${NC}"
+CURL_VERSION=$(curl -fsSL "https://api.github.com/repos/curl/curl/releases/latest" | grep '"tag_name"' \
+  | sed 's/.*"release-\([^"]*\)".*/\1/' | sed 's/_/./g' | grep '":' | sed 's/"tag.name": "curl-//g' \
+  | sed 's/",//g' | sed 's/  //g') || true
+if [ -z "${CURL_VERSION}" ]; then
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to curl 8.18.0${NC}"
+  CURL_VERSION="8.18.0"
+fi
+
 PACKAGE_VERSION="${CURL_VERSION}"
 CURL_TARBALL="curl-${CURL_VERSION}.tar.xz"
 CURL_MIRRORS=(

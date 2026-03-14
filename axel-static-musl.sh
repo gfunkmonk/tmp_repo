@@ -2,7 +2,15 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
-AXEL_VERSION="2.17.14"
+echo -e "${VIOLET}= fetching latest axel version${NC}"
+AXEL_VERSION=$(curl -fsSL "https://api.github.com/repos/axel-download-accelerator/axel/releases/latest" \
+  | grep '"tag_name"' | sed 's/.*"release-\([^"]*\)".*/\1/' | grep '"v' | sed 's/"tag_name": "v//g' | sed 's/",//g' \
+  | sed 's/  //g') || true
+if [ -z "${AXEL_VERSION}" ]; then
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to axel 2.17.14${NC}"
+  AXEL_VERSION="2.17.14"
+fi
+
 PACKAGE_VERSION="${AXEL_VERSION}"
 AXEL_TARBALL="axel-${AXEL_VERSION}.tar.xz"
 AXEL_MIRRORS=(

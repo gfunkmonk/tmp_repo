@@ -2,7 +2,14 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
-VIM_VERSION="9.2.0119"
+echo -e "${VIOLET}= fetching latest vim version${NC}"
+VIM_VERSION=$(curl -fsSL "https://api.github.com/repos/vim/vim/tags" \
+  | tools/jq/jq-$ARCH -r '.[0].name' | sed 's/v//g') || true
+if [ -z "${VIM_VERSION}" ]; then
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to vim 9.2.0119${NC}"
+  VIM_VERSION="9.2.0119"
+fi
+
 PACKAGE_VERSION="${VIM_VERSION}"
 VIM_TARBALL="vim-${VIM_VERSION}.tar.gz"
 VIM_MIRRORS=(
