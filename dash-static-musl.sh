@@ -5,19 +5,12 @@ set -euo pipefail
 DASH_VERSION="0.5.13.1"
 PACKAGE_VERSION="${DASH_VERSION}"
 DASH_TARBALL="dash-${DASH_VERSION}.tar.gz"
-DASH_MIRRORS=(
-  "http://gondor.apana.org.au/~herbert/dash/files/dash-${DASH_VERSION}.tar.gz"
-  "https://distfiles-origin.macports.org/dash/dash-${DASH_VERSION}.tar.gz"
-  "https://distfiles.alpinelinux.org/distfiles/v3.23/dash-${DASH_VERSION}.tar.gz"
-  "https://ftp.fr.openbsd.org/pub/OpenBSD/distfiles/dash-${DASH_VERSION}.tar.gz"
-  "https://mirror-hk.koddos.net/blfs/svn/d/dash-${DASH_VERSION}.tar.gz"
-  "https://mirrors.lug.mtu.edu/gentoo/distfiles/46/dash-${DASH_VERSION}.tar.gz"
-)
+DASH_URL="http://gondor.apana.org.au/~herbert/dash/files/dash-${DASH_VERSION}.tar.gz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "dash" "${DASH_VERSION}" "${DASH_TARBALL}" "${DASH_MIRRORS[@]}"
+download_source "dash" "${DASH_VERSION}" "${DASH_TARBALL}" "${DASH_URL}"
 setup_alpine_chroot "${DASH_TARBALL}"
 copy_patches "dash-0.5.13.1.patch"
 setup_qemu

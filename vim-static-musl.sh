@@ -5,15 +5,12 @@ set -euo pipefail
 VIM_VERSION="9.2.0119"
 PACKAGE_VERSION="${VIM_VERSION}"
 VIM_TARBALL="vim-${VIM_VERSION}.tar.gz"
-VIM_MIRRORS=(
-  "https://github.com/vim/vim/archive/v${VIM_VERSION}/vim-${VIM_VERSION}.tar.gz"
-  "https://fossies.org/linux/misc/vim-${VIM_VERSION}.tar.gz"
-)
+VIM_URL="https://github.com/vim/vim/archive/v${VIM_VERSION}/vim-${VIM_VERSION}.tar.gz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "vim" "${VIM_VERSION}" "${VIM_TARBALL}" "${VIM_MIRRORS[@]}"
+download_source "vim" "${VIM_VERSION}" "${VIM_TARBALL}" "${VIM_URL}"
 setup_alpine_chroot "${VIM_TARBALL}"
 setup_qemu
 mount_chroot

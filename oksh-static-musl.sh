@@ -5,15 +5,12 @@ set -euo pipefail
 OKSH_VERSION="7.8"
 PACKAGE_VERSION="${OKSH_VERSION}"
 OKSH_TARBALL="oksh-${OKSH_VERSION}.tar.gz"
-OKSH_MIRRORS=(
-  "https://github.com/ibara/oksh/releases/download/oksh-${OKSH_VERSION}/oksh-${OKSH_VERSION}.tar.gz"
-  "https://distfiles.alpinelinux.org/distfiles/v3.23/oksh-${OKSH_VERSION}.tar.gz"
-)
+OKSH_URL="https://github.com/ibara/oksh/releases/download/oksh-${OKSH_VERSION}/oksh-${OKSH_VERSION}.tar.gz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "oksh" "${OKSH_VERSION}" "${OKSH_TARBALL}" "${OKSH_MIRRORS[@]}"
+download_source "oksh" "${OKSH_VERSION}" "${OKSH_TARBALL}" "${OKSH_URL}"
 setup_alpine_chroot "${OKSH_TARBALL}"
 setup_qemu
 mount_chroot

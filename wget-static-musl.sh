@@ -5,19 +5,12 @@ set -euo pipefail
 WGET_VERSION="1.25.0"
 PACKAGE_VERSION="${WGET_VERSION}"
 WGET_TARBALL="wget-${WGET_VERSION}.tar.gz"
-WGET_MIRRORS=(
-  "https://gnu.askapache.com/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://mirror.team-cymru.com/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://ftp.wayne.edu/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://mirror.us-midwest-1.nexcess.net/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://mirrors.ibiblio.org/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-  "https://mirror.csclub.uwaterloo.ca/gnu/wget/wget-${WGET_VERSION}.tar.gz"
-)
+WGET_URL="https://ftp.gnu.org/gnu/wget/wget-${WGET_VERSION}.tar.gz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "wget" "${WGET_VERSION}" "${WGET_TARBALL}" "${WGET_MIRRORS[@]}"
+download_source "wget" "${WGET_VERSION}" "${WGET_TARBALL}" "${WGET_URL}"
 setup_alpine_chroot "${WGET_TARBALL}"
 copy_patches "wget-1.25.0-passive-ftp.patch"
 setup_qemu

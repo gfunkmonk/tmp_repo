@@ -5,18 +5,12 @@ set -euo pipefail
 NANO_VERSION="8.7.1"
 PACKAGE_VERSION="${NANO_VERSION}"
 NANO_TARBALL="nano-${NANO_VERSION}.tar.xz"
-NANO_MIRRORS=(
-  "https://www.nano-editor.org/dist/v8/nano-${NANO_VERSION}.tar.xz"
-  "https://fossies.org/linux/misc/nano-${NANO_VERSION}.tar.xz"
-  "https://mirrors.slackware.com/slackware/slackware-current/source/ap/nano/nano-${NANO_VERSION}.tar.xz"
-  "https://artfiles.org/gnupg.org/nano/nano-${NANO_VERSION}.tar.xz"
-  "https://pilotfiber.dl.sourceforge.net/project/immortalwrt/sources/nano-${NANO_VERSION}.tar.xz"
-)
+NANO_URL="https://www.nano-editor.org/dist/v8/nano-${NANO_VERSION}.tar.xz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "nano" "${NANO_VERSION}" "${NANO_TARBALL}" "${NANO_MIRRORS[@]}"
+download_source "nano" "${NANO_VERSION}" "${NANO_TARBALL}" "${NANO_URL}"
 setup_alpine_chroot "${NANO_TARBALL}"
 copy_patches "nano-8.7.1-colors.patch"
 setup_qemu

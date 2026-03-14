@@ -5,17 +5,12 @@ set -euo pipefail
 TAR_VERSION="1.35"
 PACKAGE_VERSION="${TAR_VERSION}"
 TAR_TARBALL="tar-${TAR_VERSION}.tar.xz"
-TAR_MIRRORS=(
-  "https://ftp.gnu.org/gnu/tar/tar-${TAR_VERSION}.tar.xz"
-  "https://fossies.org/linux/misc/tar-${TAR_VERSION}.tar.xz"
-  "https://mirrors.slackware.com/slackware/slackware64-current/source/a/tar/tar-${TAR_VERSION}.tar.xz"
-  "https://mirrors.omnios.org/tar/tar-${TAR_VERSION}.tar.xz"
-)
+TAR_URL="https://ftp.gnu.org/gnu/tar/tar-${TAR_VERSION}.tar.xz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "tar" "${TAR_VERSION}" "${TAR_TARBALL}" "${TAR_MIRRORS[@]}"
+download_source "tar" "${TAR_VERSION}" "${TAR_TARBALL}" "${TAR_URL}"
 setup_alpine_chroot "${TAR_TARBALL}"
 copy_patches "tar-1.35.patch"
 setup_qemu

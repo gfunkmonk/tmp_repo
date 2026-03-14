@@ -11,14 +11,7 @@ BASH_PATCH_DIR="bash-${BASH_VERSION}-patches"
 BASH_PATCH_PREFIX="bash${BASH_MAJOR_MINOR}-"
 BASH_PATCH_URL="https://ftp.gnu.org/gnu/bash/${BASH_PATCH_DIR}/"
 CHROOT_DIR="./pasta"
-BASH_MIRRORS=(
-  "https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz"
-  "https://mirrors.ocf.berkeley.edu/gnu/bash/bash-${BASH_VERSION}.tar.gz"
-  "https://mirrors.kernel.org/gnu/bash/bash-${BASH_VERSION}.tar.gz"
-  "https://mirrors.ibiblio.org/pub/mirrors/gnu/bash/bash-${BASH_VERSION}.tar.gz"
-  "https://mirror.us-midwest-1.nexcess.net/gnu/bash/bash-${BASH_VERSION}.tar.gz"
-
-)
+BASH_URL="https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz"
 
 download_bash_upstream_patches() {
   echo -e "${AQUA}= download bash ${BASH_VERSION} upstream patches${NC}"
@@ -62,7 +55,7 @@ download_bash_upstream_patches() {
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
+download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_URL}"
 download_bash_upstream_patches
 setup_alpine_chroot "${BASH_TARBALL}"
 cp -r "${BASH_PATCH_DIR}" ./pasta/

@@ -5,16 +5,12 @@ set -euo pipefail
 LFTP_VERSION="4.9.3"
 PACKAGE_VERSION="${LFTP_VERSION}"
 LFTP_TARBALL="lftp-${LFTP_VERSION}.tar.xz"
-LFTP_MIRRORS=(
-  "https://lftp.yar.ru/ftp/lftp-${LFTP_VERSION}.tar.xz"
-  "https://distfiles.openadk.org/lftp-${LFTP_VERSION}.tar.xz"
-  "https://fossies.org/linux/misc/lftp-${LFTP_VERSION}.tar.xz"
-)
+LFTP_URL="https://lftp.yar.ru/ftp/lftp-${LFTP_VERSION}.tar.xz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "lftp" "${LFTP_VERSION}" "${LFTP_TARBALL}" "${LFTP_MIRRORS[@]}"
+download_source "lftp" "${LFTP_VERSION}" "${LFTP_TARBALL}" "${LFTP_URL}"
 setup_alpine_chroot "${LFTP_TARBALL}"
 copy_patches "lftp-4.9.3.patch"
 setup_qemu

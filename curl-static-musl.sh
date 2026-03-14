@@ -5,19 +5,12 @@ set -euo pipefail
 CURL_VERSION="8.18.0"
 PACKAGE_VERSION="${CURL_VERSION}"
 CURL_TARBALL="curl-${CURL_VERSION}.tar.xz"
-CURL_MIRRORS=(
-  "https://curl.se/download/curl-${CURL_VERSION}.tar.xz"
-  "https://github.com/curl/curl/releases/download/curl-8_18_0/curl-${CURL_VERSION}.tar.xz"
-  "https://mirrors.omnios.org/curl/curl-${CURL_VERSION}.tar.xz"
-  "https://mirrors.slackware.com/slackware/slackware-current/source/n/curl/curl-${CURL_VERSION}.tar.xz"
-  "https://ftp.belnet.be/mirror/rsync.gentoo.org/gentoo/distfiles/e8/curl-${CURL_VERSION}.tar.xz"
-  "https://mirror.ircam.fr/pub/OpenBSD/distfiles/curl-${CURL_VERSION}.tar.xz"
-)
+CURL_URL="https://github.com/curl/curl/releases/download/curl-${CURL_VERSION//./_}/curl-${CURL_VERSION}.tar.xz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "curl" "${CURL_VERSION}" "${CURL_TARBALL}" "${CURL_MIRRORS[@]}"
+download_source "curl" "${CURL_VERSION}" "${CURL_TARBALL}" "${CURL_URL}"
 setup_alpine_chroot "${CURL_TARBALL}"
 setup_qemu
 mount_chroot

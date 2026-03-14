@@ -5,17 +5,12 @@ set -euo pipefail
 XZ_VERSION="5.8.2"
 PACKAGE_VERSION="${XZ_VERSION}"
 XZ_TARBALL="xz-${XZ_VERSION}.tar.xz"
-XZ_MIRRORS=(
-  "https://github.com/tukaani-project/xz/releases/download/v${XZ_VERSION}/xz-${XZ_VERSION}.tar.xz"
-  "https://netactuate.dl.sourceforge.net/project/lzmautils/xz-${XZ_VERSION}.tar.xz"
-  "https://www.mirrorservice.org/pub/slackware/slackware-current/source/a/xz/xz-${XZ_VERSION}.tar.xz"
-  "https://m3-container.net/M3_Container/oss_packages/xz-${XZ_VERSION}.tar.xz"
-)
+XZ_URL="https://github.com/tukaani-project/xz/releases/download/v${XZ_VERSION}/xz-${XZ_VERSION}.tar.xz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "xz" "${XZ_VERSION}" "${XZ_TARBALL}" "${XZ_MIRRORS[@]}"
+download_source "xz" "${XZ_VERSION}" "${XZ_TARBALL}" "${XZ_URL}"
 setup_alpine_chroot "${XZ_TARBALL}"
 setup_qemu
 mount_chroot

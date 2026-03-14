@@ -14,17 +14,12 @@ echo -e "${MINT}= building aria2 version: ${ARIA2_VERSION}${NC}"
 PACKAGE_VERSION="${ARIA2_VERSION}"
 
 ARIA2_TARBALL="aria2-${ARIA2_VERSION}.tar.gz"
-ARIA2_MIRRORS=(
-  "https://github.com/aria2/aria2/releases/download/release-${ARIA2_VERSION}/aria2-${ARIA2_VERSION}.tar.gz"
-  "https://distfiles.alpinelinux.org/distfiles/v3.21/aria2-${ARIA2_VERSION}.tar.gz"
-  "https://sources.voidlinux.org/aria2-${ARIA2_VERSION}/aria2-${ARIA2_VERSION}.tar.gz"
-  "https://mirrors.lug.mtu.edu/gentoo/distfiles/aria2-${ARIA2_VERSION}.tar.gz"
-)
+ARIA2_URL="https://github.com/aria2/aria2/releases/download/release-${ARIA2_VERSION}/aria2-${ARIA2_VERSION}.tar.gz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "aria2" "${ARIA2_VERSION}" "${ARIA2_TARBALL}" "${ARIA2_MIRRORS[@]}"
+download_source "aria2" "${ARIA2_VERSION}" "${ARIA2_TARBALL}" "${ARIA2_URL}"
 setup_alpine_chroot "${ARIA2_TARBALL}"
 copy_patches "aria2-1.37.0.patch"
 setup_qemu

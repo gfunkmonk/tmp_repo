@@ -5,18 +5,12 @@ set -euo pipefail
 BSDTAR_VERSION="3.8.5"
 PACKAGE_VERSION="${BSDTAR_VERSION}"
 BSDTAR_TARBALL="libarchive-${BSDTAR_VERSION}.tar.xz"
-BSDTAR_MIRRORS=(
-  "https://github.com/libarchive/libarchive/releases/download/v${BSDTAR_VERSION}/libarchive-${BSDTAR_VERSION}.tar.xz"
-  "https://mirror.fcix.net/slackware/slackware-current/source/l/libarchive/libarchive-${BSDTAR_VERSION}.tar.xz"
-  "https://sources.voidlinux.org/libarchive-${BSDTAR_VERSION}/libarchive-${BSDTAR_VERSION}.tar.xz"
-  "https://ftp2.osuosl.org/pub/blfs/svn/l/libarchive-${BSDTAR_VERSION}.tar.xz"
-  "https://ftp.fau.de/macports/distfiles/libarchive/libarchive-${BSDTAR_VERSION}.tar.xz"
-)
+BSDTAR_URL="https://github.com/libarchive/libarchive/releases/download/v${BSDTAR_VERSION}/libarchive-${BSDTAR_VERSION}.tar.xz"
 
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "libarchive" "${BSDTAR_VERSION}" "${BSDTAR_TARBALL}" "${BSDTAR_MIRRORS[@]}"
+download_source "libarchive" "${BSDTAR_VERSION}" "${BSDTAR_TARBALL}" "${BSDTAR_URL}"
 setup_alpine_chroot "${BSDTAR_TARBALL}"
 setup_qemu
 mount_chroot

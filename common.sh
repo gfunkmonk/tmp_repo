@@ -60,32 +60,23 @@ install_host_deps() {
   sudo apt-get update -qy && sudo apt-get install -y "${DEBIAN_DEPS[@]}"
 }
 
-# download_source LABEL VERSION TARBALL mirror1 [mirror2 ...]
-# Downloads TARBALL from the first mirror that succeeds.
+# download_source LABEL VERSION TARBALL URL
+# Downloads TARBALL from URL.
 # Skips the download if TARBALL already exists (e.g. restored from cache).
 download_source() {
-  local label="$1" version="$2" tarball="$3"
-  shift 3
+  local label="$1" version="$2" tarball="$3" url="$4"
   if [ -f "${tarball}" ]; then
     echo -e "${SLATE}= ${label}-${version}: ${tarball} already cached, skipping download${NC}"
     return 0
   fi
   echo -e "${AQUA}= downloading ${label}-${version} tarball${NC}"
-  local downloaded=false
-  for mirror in "$@"; do
-    echo -e "${TAWNY}= trying mirror: ${mirror}${NC}"
-    if curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
-        -o "${tarball}" "${mirror}"; then
-      echo -e "${MINT}= downloaded from: ${mirror}${NC}"
-      downloaded=true
-      break
-    else
-      echo -e "${LEMON}= failed: ${mirror}${NC}"
-      rm -f "${tarball}"
-    fi
-  done
-  if [ "${downloaded}" = false ]; then
-    echo -e "${TOMATO}= ERROR: all mirrors failed for ${tarball}${NC}"
+  echo -e "${TAWNY}= url: ${url}${NC}"
+  if curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
+      -o "${tarball}" "${url}"; then
+    echo -e "${MINT}= downloaded: ${tarball}${NC}"
+  else
+    echo -e "${TOMATO}= ERROR: download failed for ${tarball}${NC}"
+    rm -f "${tarball}"
     exit 1
   fi
 }
