@@ -11,8 +11,6 @@ if [ -z "${CURL_VERSION}" ]; then
   CURL_VERSION="8.19.0"
 fi
 
-https://curl.se/download/curl-8.19.0.tar.xz
-
 PACKAGE_VERSION="${CURL_VERSION}"
 CURL_GIT_VER="$(echo $CURL_VERSION | sed 's/\./_/g')"
 CURL_TARBALL="curl-${CURL_VERSION}.tar.xz"
