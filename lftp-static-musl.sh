@@ -27,17 +27,11 @@ autoconf \
 automake \
 libtool \
 linux-headers \
-perl \
-python3 \
-python3-dev \
 expat-dev \
 expat-static \
-gettext-dev \
-gettext-static \
 libidn-dev \
 libunistring-dev \
 libunistring-static \
-make \
 pkgconfig \
 ncurses-dev \
 ncurses-static \

@@ -50,7 +50,6 @@ libxml2-static \
 util-linux-static \
 xz-dev \
 xz-static \
-curl \
 patch \
 pkgconfig && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \

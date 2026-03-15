@@ -38,8 +38,6 @@ libunistring-dev \
 libunistring-static \
 patch \
 texinfo \
-pcre2-dev \
-pcre2-static \
 perl && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \

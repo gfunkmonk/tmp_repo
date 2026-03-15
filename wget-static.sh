@@ -101,15 +101,11 @@ openssl-dev \
 zlib-dev \
 libidn2-dev \
 libpsl-dev \
-libuuid \
 curl \
-gawk \
 libidn2-static \
 openssl-libs-static \
 zlib-static \
 libpsl-static \
-flex \
-bison \
 libunistring-dev \
 libunistring-static \
 upx \

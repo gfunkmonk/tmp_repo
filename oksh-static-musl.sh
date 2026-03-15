@@ -29,22 +29,9 @@ mount_chroot
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-make \
-automake \
-clang \
-libtool \
-bison \
-flex \
 pkgconfig \
-readline-dev \
-readline-static \
-libedit \
-libedit-dev \
-libedit-static \
 ncurses-dev \
-ncurses-static \
-autoconf \
-patch && \
+ncurses-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf oksh-${OKSH_VERSION}.tar.gz && \

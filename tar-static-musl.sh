@@ -25,7 +25,6 @@ mount_chroot
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-make \
 automake \
 autoconf \
 pkgconfig \
@@ -37,14 +36,8 @@ zstd-dev \
 zstd-static \
 lz4-dev \
 lz4-static \
-openssl-dev \
-openssl-libs-static \
-libxml2-dev \
-libxml2-static \
 libbz2 \
-bzip2-static \
-gettext-dev \
-gettext-static && \
+bzip2-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf tar-${TAR_VERSION}.tar.xz && \
