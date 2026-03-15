@@ -7,8 +7,8 @@ BSDTAR_VERSION=$(curl -fsSL "https://api.github.com/repos/libarchive/libarchive/
   | grep '"tag_name"' | sed 's/.*"release-\([^"]*\)".*/\1/' | grep '"v' | sed 's/"tag_name": "v//g' \
   | sed 's/",//g' | sed 's/  //g') || true
 if [ -z "${BSDTAR_VERSION}" ]; then
-  echo -e "${TAWNY}= GitHub API unavailable, falling back to bsdtar 3.8.5${NC}"
-  BSDTAR_VERSION="3.8.5"
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to bsdtar 3.8.6${NC}"
+  BSDTAR_VERSION="3.8.6"
 fi
 
 PACKAGE_VERSION="${BSDTAR_VERSION}"
