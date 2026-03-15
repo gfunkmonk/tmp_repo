@@ -650,3 +650,62 @@ index 00000000..536d9918
  #  if defined (HAVE_STDBOOL_H)
  #    include <stdbool.h>
  #  else
+# DP: Fix bug in Bash_aliases example.
+
+--- a/examples/startup-files/Bash_aliases
++++ b/examples/startup-files/Bash_aliases
+@@ -41,20 +41,20 @@
+ { 
+     local count="$1" i;
+     shift;
+-    for i in $(seq 1 "$count");
++    for i in $(_seq 1 "$count");
+     do
+         eval "$@";
+     done
+ }
+ 
+ # Subfunction needed by `repeat'.
+-seq ()
++_seq ()
+ { 
+     local lower upper output;
+     lower=$1 upper=$2;
+ 
+     if [ $lower -ge $upper ]; then return; fi
+-    while [ $lower -le $upper ];
++    while [ $lower -lt $upper ];
+     do
+ 	echo -n "$lower "
+         lower=$(($lower + 1))
+# DP: Use `command -v editor`, as an editor, if available.
+
+--- a/bashline.c
++++ b/bashline.c
+@@ -934,8 +934,8 @@ hostnames_matching (const char *text)
+    command being entered (if no explicit argument is given), otherwise on
+    a command from the history file. */
+ 
+-#define VI_EDIT_COMMAND		"fc -e \"${VISUAL:-${EDITOR:-vi}}\""
+-#define EMACS_EDIT_COMMAND	"fc -e \"${VISUAL:-${EDITOR:-emacs}}\""
++#define VI_EDIT_COMMAND		"fc -e \"${VISUAL:-${EDITOR:-$(command -v editor || echo vi)}}\""
++#define EMACS_EDIT_COMMAND	"fc -e \"${VISUAL:-${EDITOR:-$(command -v editor || echo emacs)}}\""
+ #define POSIX_VI_EDIT_COMMAND	"fc -e vi"
+ 
+ static int
+--- a/builtins/fc.def
++++ b/builtins/fc.def
+@@ -181,11 +181,11 @@ uw_unlink (void *fn)
+ }
+ 
+ /* String to execute on a file that we want to edit. */
+-#define FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-vi}}"
++#define FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-$(command -v editor || echo vi)}}"
+ #if defined (STRICT_POSIX)
+ #  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-ed}"
+ #else
+-#  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-ed}}"
++#  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-$(command -v editor || echo ed)}}"
+ #endif
+ 
+ int

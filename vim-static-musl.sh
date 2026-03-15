@@ -22,6 +22,7 @@ setup_cleanup
 install_host_deps
 download_source "vim" "${VIM_VERSION}" "${VIM_TARBALL}" "${VIM_MIRRORS[@]}"
 setup_alpine_chroot "${VIM_TARBALL}"
+copy_patches "vim.patch"
 setup_qemu
 mount_chroot
 
@@ -29,6 +30,7 @@ sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 sed \
+patch \
 pkgconfig \
 ncurses-dev \
 ncurses-static && \
@@ -36,6 +38,7 @@ mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASED
 chmod 755 upx && \
 tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \
+patch -p1 --fuzz=4 < ../vim.patch && \
 sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
 ./configure CC='gcc' \
   --disable-channel --disable-gpm --disable-gtktest --disable-gui \

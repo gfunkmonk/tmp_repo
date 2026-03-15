@@ -1,0 +1,52 @@
+Description: Fix flaky vim test
+Author: Spyros Seimenis <spyros.seimenis@canonical.com>
+Last-Update: 2021-11-05
+
+--- a/src/testdir/test_terminal.vim
++++ b/src/testdir/test_terminal.vim
+@@ -529,6 +529,7 @@ func Test_terminal_postponed_scrollback(
+   call VerifyScreenDump(buf, 'Test_terminal_scrollback_2', {})
+ 
+   " Back to Terminal-Job mode, text will scroll and show the extra line.
++  call TermWait(buf, 200)
+   call term_sendkeys(buf, "a")
+   call VerifyScreenDump(buf, 'Test_terminal_scrollback_3', {})
+ 
+--- a/src/testdir/test_regexp_latin.vim
++++ b/src/testdir/test_regexp_latin.vim
+@@ -172,7 +172,7 @@ func Test_pattern_compile_speed()
+   let start = reltime()
+   " this used to be very slow, not it should be about a second
+   set spc=\\v(((((Nxxxxxxx&&xxxx){179})+)+)+){179}
+-  call assert_inrange(0.01, 10.0, reltimefloat(reltime(start)))
++  call assert_inrange(0.01, 30.0, reltimefloat(reltime(start)))
+   set spc=
+ endfunc
+ 
+Description: Disable a test that checked allocated terminal name which was
+failing due to a string comparison error unrelated to changes in vim.
+Author: Ural Tunaboyu <ural.tunaboyu@canonical.com>
+Last-Update: 2026-02-18
+
+Bug-Ubuntu: https://launchpad.net/bugs/2142681
+--- a/src/testdir/test_terminal2.vim
++++ b/src/testdir/test_terminal2.vim
+@@ -699,6 +699,7 @@
+ endfunc
+
+ func Test_term_gettty()
++  throw 'Skipped: bad string comparison in tty name'
+   let buf = Run_shell_in_terminal({})
+   let gettty = term_gettty(buf)
+
+--- a/runtime/syntax/grub.vim
++++ b/runtime/syntax/grub.vim
+@@ -40,7 +40,7 @@ syn keyword grubCommand       contained
+                               \ displaymem embed find fstest geometry halt help
+                               \ impsprobe initrd install ioprobe kernel lock
+                               \ makeactive map md5crypt module modulenounzip pause
+-                              \ quit reboot read root rootnoverify savedefault setup
++                              \ quiet quit reboot read root rootnoverify savedefault setup
+                               \ testload testvbe uppermem vbeprobe
+ 
+ syn keyword grubSpecial       saved

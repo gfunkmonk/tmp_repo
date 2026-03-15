@@ -26,6 +26,7 @@ setup_cleanup
 install_host_deps
 download_source "libarchive" "${BSDTAR_VERSION}" "${BSDTAR_TARBALL}" "${BSDTAR_MIRRORS[@]}"
 setup_alpine_chroot "${BSDTAR_TARBALL}"
+copy_patches "libarchive-3.8.5-fix_valgrind_warning.patch"
 setup_qemu
 mount_chroot
 
@@ -35,6 +36,7 @@ musl-dev \
 ccache \
 make \
 pkgconfig \
+patch \
 zlib-dev \
 zlib-static \
 xz-dev \
@@ -51,6 +53,7 @@ mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASED
 chmod 755 upx && \
 tar xf libarchive-${BSDTAR_VERSION}.tar.xz && \
 cd libarchive-${BSDTAR_VERSION}/ && \
+patch -p1 --fuzz=4 < ../libarchive-3.8.5-fix_valgrind_warning.patch && \
 ./configure CC=gcc \
   --disable-shared --enable-static \
   --enable-bsdtar=static \
