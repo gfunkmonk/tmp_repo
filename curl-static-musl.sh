@@ -56,12 +56,8 @@ ca-certificates \
 ca-certificates-bundle \
 brotli-dev \
 brotli-static \
-nghttp3-dev \
-nghttp3-static \
 nghttp2-dev \
 nghttp2-static \
-ngtcp2-dev \
-ngtcp2-static \
 libidn2-dev \
 libidn2-static \
 clang && \
@@ -74,8 +70,7 @@ cd curl-${CURL_VERSION}/ && \
   --disable-ldap --enable-ipv6 --enable-unix-sockets \
   --with-ssl --with-libssh2 \
   --disable-docs --disable-manual --without-libpsl \
-  --with-brotli --with-nghttp3 --with-nghttp2 --with-ngtcp2 \
-  --with-libidn2 \
+  --with-brotli --with-nghttp2 --with-libidn2 \
   CC=clang LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) V=1 LDFLAGS='-static -all-static' && \
