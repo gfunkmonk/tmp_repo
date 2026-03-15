@@ -26,9 +26,7 @@ mount_chroot
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-make \
 automake \
-clang \
 libtool \
 bison \
 flex \

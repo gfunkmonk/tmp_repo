@@ -32,7 +32,6 @@ sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 clang \
-make \
 pkgconfig && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \

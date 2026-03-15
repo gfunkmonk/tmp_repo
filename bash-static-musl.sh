@@ -73,7 +73,7 @@ mount_chroot
 sudo chroot "${CHROOT_DIR}/" /bin/sh -s <<EOF
 set -e
 apk update
-apk add build-base musl-dev ccache sed make gcc automake autoconf pkgconfig ncurses-dev ncurses-static python3-dev perl-dev perl gettext-dev gettext-static readline readline-static
+apk add build-base musl-dev ccache sed automake autoconf pkgconfig ncurses-dev ncurses-static perl gettext-dev gettext-static readline readline-static
 mkdir -p /ccache
 export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH
 chmod 755 upx
