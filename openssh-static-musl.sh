@@ -43,4 +43,4 @@ make -j\$(nproc) && \
 strip ssh && \
 ../upx --lzma ssh"
 
-package_output "ssh" "./pasta/openssh-${OPENSSH_VERSION}/ssh"
+package_output "openssh" "./pasta/openssh-${OPENSSH_VERSION}/ssh"
