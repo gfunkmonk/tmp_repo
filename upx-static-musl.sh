@@ -21,7 +21,7 @@ UPX_MIRRORS=(
 setup_arch
 setup_cleanup
 install_host_deps
-download_source "curl" "${UPX_VERSION}" "${UPX_TARBALL}" "${UPX_MIRRORS[@]}"
+download_source "upx" "${UPX_VERSION}" "${UPX_TARBALL}" "${UPX_MIRRORS[@]}"
 setup_alpine_chroot "${UPX_TARBALL}"
 setup_qemu
 mount_chroot
