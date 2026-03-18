@@ -95,10 +95,10 @@ chmod 755 upx && \
 git clone http://github.com/gfunkmonk/upx upx-${UPX_VERSION} --depth=1 && \
 cd upx-${UPX_VERSION}/ && \
 git submodule init && git submodule update \
-mkdir build && cd build/ \
+mkdir build && cd build/ && \
 cmake -DUPX_CONFIG_DISABLE_WSTRICT=ON -DUPX_CONFIG_DISABLE_WERROR=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections -static" \
   -DCMAKE_C_FLAGS="-Os -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector" -DCMAKE_CXX_FLAGS="-Os -ffunction-sections \
-  -fdata-sections -fomit-frame-pointer -fno-stack-protector" ..
+  -fdata-sections -fomit-frame-pointer -fno-stack-protector" .. && \
 make -j\$(nproc) LDFLAGS='-static -all-static' && \
 strip upx && \
 ../upx --lzma upx"
