@@ -75,7 +75,7 @@ zstd-static \
 git \
 cmake \
 clang \
-ninja-build \
+ninja-build && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 git clone http://github.com/gfunkmonk/upx upx-${UPX_VERSION} --depth=1 && \
 cd upx-${UPX_VERSION}/ && \
