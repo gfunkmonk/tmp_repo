@@ -17,7 +17,7 @@ setup_cleanup
 install_host_deps
 download_source "tar" "${TAR_VERSION}" "${TAR_TARBALL}" "${TAR_MIRRORS[@]}"
 setup_alpine_chroot "${TAR_TARBALL}"
-copy_patches "tar-1.35.patch"
+copy_patches "tar.patch"
 setup_qemu
 mount_chroot
 
@@ -25,7 +25,6 @@ mount_chroot
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-make \
 automake \
 autoconf \
 pkgconfig \
@@ -37,10 +36,6 @@ zstd-dev \
 zstd-static \
 lz4-dev \
 lz4-static \
-openssl-dev \
-openssl-libs-static \
-libxml2-dev \
-libxml2-static \
 libbz2 \
 bzip2-static \
 gettext-dev \
@@ -49,12 +44,12 @@ mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASED
 chmod 755 upx && \
 tar xf tar-${TAR_VERSION}.tar.xz && \
 cd tar-${TAR_VERSION}/ && \
-patch -p1 --fuzz=4 < ../tar-1.35.patch && \
+patch -p1 --fuzz=4 < ../tar.patch && \
 autoreconf -f -i && \
 FORCE_UNSAFE_CONFIGURE=1 ./configure CC=gcc  --without-selinux \
   --disable-nls --disable-rpath --enable-largefile \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -ffunction-sections -fdata-sections -no-pie' && \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie' && \
 make -j\$(nproc) && \
 strip src/tar && \
 ../upx --lzma src/tar"

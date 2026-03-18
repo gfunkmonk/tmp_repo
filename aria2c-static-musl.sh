@@ -26,7 +26,7 @@ setup_cleanup
 install_host_deps
 download_source "aria2" "${ARIA2_VERSION}" "${ARIA2_TARBALL}" "${ARIA2_MIRRORS[@]}"
 setup_alpine_chroot "${ARIA2_TARBALL}"
-copy_patches "aria2-1.37.0.patch"
+copy_patches "aria2.patch"
 setup_qemu
 mount_chroot
 
@@ -57,14 +57,14 @@ mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASED
 chmod 755 upx && \
 tar xf aria2-${ARIA2_VERSION}.tar.gz && \
 cd aria2-${ARIA2_VERSION}/ && \
-patch -p1 --fuzz=4 < ../aria2-1.37.0.patch && \
+patch -p1 --fuzz=4 < ../aria2.patch && \
 ./configure CC=gcc ARIA2_STATIC=yes \
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
   --without-gnutls --with-openssl --with-libcares \
   --disable-bittorrent --with-sqlite3 \
   --enable-shared=no --enable-static --disable-shared \
-  LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -Wno-unterminated-string-initialization' && \
+  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip src/aria2c && \
 ../upx --lzma src/aria2c"

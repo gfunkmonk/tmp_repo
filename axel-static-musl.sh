@@ -47,8 +47,8 @@ mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASED
 chmod 755 upx && \
 tar xf axel-${AXEL_VERSION}.tar.xz && \
 cd axel-${AXEL_VERSION}/ && \
-./configure CC=gcc LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -Wno-unterminated-string-initialization' && \
+./configure CC=gcc LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
 strip axel && \
 ../upx --lzma axel"

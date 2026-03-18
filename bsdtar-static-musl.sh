@@ -7,8 +7,8 @@ BSDTAR_VERSION=$(curl -fsSL "https://api.github.com/repos/libarchive/libarchive/
   | grep '"tag_name"' | sed 's/.*"release-\([^"]*\)".*/\1/' | grep '"v' | sed 's/"tag_name": "v//g' \
   | sed 's/",//g' | sed 's/  //g') || true
 if [ -z "${BSDTAR_VERSION}" ]; then
-  echo -e "${TAWNY}= GitHub API unavailable, falling back to bsdtar 3.8.5${NC}"
-  BSDTAR_VERSION="3.8.5"
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to bsdtar 3.8.6${NC}"
+  BSDTAR_VERSION="3.8.6"
 fi
 
 PACKAGE_VERSION="${BSDTAR_VERSION}"
@@ -57,8 +57,8 @@ cd libarchive-${BSDTAR_VERSION}/ && \
   --disable-bsdcat --disable-bsdcpio \
   --with-zlib --without-bz2lib \
   --disable-maintainer-mode --disable-dependency-tracking \
-  LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -no-pie' && \
+  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie' && \
 make -j\$(nproc) && \
 gcc -static -o bsdtar tar/bsdtar-bsdtar.o \
   tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o \

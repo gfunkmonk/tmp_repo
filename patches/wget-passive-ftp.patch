@@ -1,5 +1,3 @@
-make passive-ftp the default
-
 --- a/doc/sample.wgetrc
 +++ b/doc/sample.wgetrc
 @@ -49,6 +49,7 @@

@@ -7,15 +7,16 @@ CURL_VERSION=$(curl -fsSL "https://api.github.com/repos/curl/curl/releases/lates
   | sed 's/.*"release-\([^"]*\)".*/\1/' | sed 's/_/./g' | grep '":' | sed 's/"tag.name": "curl-//g' \
   | sed 's/",//g' | sed 's/  //g') || true
 if [ -z "${CURL_VERSION}" ]; then
-  echo -e "${TAWNY}= GitHub API unavailable, falling back to curl 8.18.0${NC}"
-  CURL_VERSION="8.18.0"
+  echo -e "${TAWNY}= GitHub API unavailable, falling back to curl 8.19.0${NC}"
+  CURL_VERSION="8.19.0"
 fi
 
 PACKAGE_VERSION="${CURL_VERSION}"
+CURL_GIT_VER="$(echo $CURL_VERSION | sed 's/\./_/g')"
 CURL_TARBALL="curl-${CURL_VERSION}.tar.xz"
 CURL_MIRRORS=(
   "https://curl.se/download/curl-${CURL_VERSION}.tar.xz"
-  "https://github.com/curl/curl/releases/download/curl-8_18_0/curl-${CURL_VERSION}.tar.xz"
+  "https://github.com/curl/curl/releases/download/curl-${CURL_GIT_VER}/curl-${CURL_VERSION}.tar.xz"
   "https://mirrors.omnios.org/curl/curl-${CURL_VERSION}.tar.xz"
   "https://mirrors.slackware.com/slackware/slackware-current/source/n/curl/curl-${CURL_VERSION}.tar.xz"
   "https://ftp.belnet.be/mirror/rsync.gentoo.org/gentoo/distfiles/e8/curl-${CURL_VERSION}.tar.xz"
@@ -43,6 +44,14 @@ zlib-dev \
 zlib-static \
 zstd-dev \
 zstd-static \
+autoconf \
+automake \
+libunistring-static \
+libunistring-dev \
+libidn2-static \
+libidn2-dev \
+libpsl-static \
+libpsl-dev \
 clang && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
@@ -53,8 +62,8 @@ cd curl-${CURL_VERSION}/ && \
   --disable-ldap --enable-ipv6 --enable-unix-sockets \
   --with-ssl --with-libssh2 \
   --disable-docs --disable-manual --without-libpsl \
-  CC=clang LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -Wno-unterminated-string-initialization' && \
+  CC=clang LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) V=1 LDFLAGS='-static -all-static' && \
 strip src/curl && \
 ../upx --lzma src/curl"

@@ -29,18 +29,7 @@ mount_chroot
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-make \
-automake \
-clang \
-libtool \
-bison \
-flex \
 pkgconfig \
-readline-dev \
-readline-static \
-libedit \
-libedit-dev \
-libedit-static \
 ncurses-dev \
 ncurses-static \
 autoconf \

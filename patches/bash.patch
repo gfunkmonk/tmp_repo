@@ -1,64 +1,7 @@
-From adb0ad3d9a4bd05838042668474950b3e0fcf04d Mon Sep 17 00:00:00 2001
-From: oficsu <oficsu@gmail.com>
-Date: Fri, 12 Jul 2024 20:00:00 +0300
-Subject: [PATCH] make the bash fc builtin more reliable for scripting
-
-This patch adds two new flags for the fc builtin:
-* `-t` makes the output HISTTIMEFORMAT-aware,
-* `-0` separates output by null-terminator
-
-Rationale
-
-It's nearly impossible to parse the bash history for
-interactive usage due to the following trade-offs:
-* you can use `history | tac` at the cost of startup
-  delay when you are working with a large history;
-* you can use `fc -lr` at the cost of datetime info,
-  because the fc lacks support for HISTTIMEFORMAT;
-* you can implement your own history parser, but you
-  can't make sure the code follows the behavior of
-  the fc in edge cases
-
-Making it HISTTIMEFORMAT-aware resolves these issues
-
-Secondly, the builtin is not reliable for scripting,
-since it separates history entries by '\n', creating
-ambiguity between the separators and history entries
-themselves, which can also contain '\n'. Workarounds
-do exist, but why not simply improve the fc?
-
-Modern tools (including GNU) can natively print/read
-output with null-terminated entries. Examples:
-* `xargs -0`,
-* `find -print0`,
-* `comm -z`,
-* `ls --zero`,
-* `fzf --read0`,
-* and many others...
-
-It would be helpful and consistent if the fc builtin
-also had a similar flag
----
- Makefile.in          |  3 ++-
- builtins/Makefile.in | 10 ++++----
- builtins/fc.def      | 43 ++++++++++++++++++++++++++-------
- builtins/history.def | 26 ++------------------
- builtins/histtime.c  | 50 ++++++++++++++++++++++++++++++++++++++
- builtins/histtime.h  | 21 ++++++++++++++++
- tests/builtins.right |  4 ++--
- tests/history.right  | 41 ++++++++++++++++++++++++++++++-
- tests/history.tests  |  1 +
- tests/history10.sub  | 57 ++++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 216 insertions(+), 40 deletions(-)
- create mode 100644 builtins/histtime.c
- create mode 100644 builtins/histtime.h
- create mode 100644 tests/history10.sub
-
-diff --git a/Makefile.in b/Makefile.in
-index c4a882f7..5967bc64 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -559,7 +559,7 @@ BUILTIN_DEFS = $(DEFSRC)/alias.def $(DEFSRC)/bind.def $(DEFSRC)/break.def \
+diff -ruN bash-5.3.orig/Makefile.in bash-5.3/Makefile.in
+--- bash-5.3.orig/Makefile.in	2025-05-16 14:56:31.000000000 -0400
++++ bash-5.3/Makefile.in	2026-03-17 17:12:39.786679384 -0400
+@@ -559,7 +559,7 @@
  BUILTIN_C_SRC  = $(DEFSRC)/mkbuiltins.c $(DEFSRC)/common.c \
  		 $(DEFSRC)/evalstring.c $(DEFSRC)/evalfile.c \
  		 $(DEFSRC)/bashgetopt.c $(GETOPT_SOURCE)
@@ -67,7 +10,7 @@ index c4a882f7..5967bc64 100644
  		 $(DEFDIR)/evalfile.o $(DEFDIR)/bashgetopt.o
  BUILTIN_OBJS = $(DEFDIR)/alias.o $(DEFDIR)/bind.o $(DEFDIR)/break.o \
  	       $(DEFDIR)/builtin.o $(DEFDIR)/cd.o $(DEFDIR)/colon.o \
-@@ -1839,6 +1839,7 @@ $(DEFDIR)/break.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
+@@ -1839,6 +1839,7 @@
  $(DEFDIR)/caller.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  $(DEFDIR)/cd.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  $(DEFDIR)/common.c: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
@@ -75,11 +18,36 @@ index c4a882f7..5967bc64 100644
  $(DEFDIR)/complete.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  $(DEFDIR)/declare.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  $(DEFDIR)/enable.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
-diff --git a/builtins/Makefile.in b/builtins/Makefile.in
-index 7e0ec324..b9a0680b 100644
---- a/builtins/Makefile.in
-+++ b/builtins/Makefile.in
-@@ -154,12 +154,12 @@ DEFSRC =  $(srcdir)/alias.def $(srcdir)/bind.def $(srcdir)/break.def \
+diff -ruN bash-5.3.orig/bashansi.h bash-5.3/bashansi.h
+--- bash-5.3.orig/bashansi.h	2024-03-25 12:17:49.000000000 -0400
++++ bash-5.3/bashansi.h	2026-03-17 17:12:39.791786664 -0400
+@@ -36,7 +36,7 @@
+ #endif /* !HAVE_STDLIB_H */
+ 
+ /* If bool is not a compiler builtin, prefer stdbool.h if we have it */
+-#if !defined (HAVE_C_BOOL)
++#if !defined (HAVE_C_BOOL) && !(defined (__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+ #  if defined (HAVE_STDBOOL_H)
+ #    include <stdbool.h>
+ #  else
+diff -ruN bash-5.3.orig/bashline.c bash-5.3/bashline.c
+--- bash-5.3.orig/bashline.c	2025-06-25 15:53:44.000000000 -0400
++++ bash-5.3/bashline.c	2026-03-17 17:12:39.792789224 -0400
+@@ -934,8 +934,8 @@
+    command being entered (if no explicit argument is given), otherwise on
+    a command from the history file. */
+ 
+-#define VI_EDIT_COMMAND		"fc -e \"${VISUAL:-${EDITOR:-vi}}\""
+-#define EMACS_EDIT_COMMAND	"fc -e \"${VISUAL:-${EDITOR:-emacs}}\""
++#define VI_EDIT_COMMAND		"fc -e \"${VISUAL:-${EDITOR:-$(command -v editor || echo vi)}}\""
++#define EMACS_EDIT_COMMAND	"fc -e \"${VISUAL:-${EDITOR:-$(command -v editor || echo emacs)}}\""
+ #define POSIX_VI_EDIT_COMMAND	"fc -e vi"
+ 
+ static int
+diff -ruN bash-5.3.orig/builtins/Makefile.in bash-5.3/builtins/Makefile.in
+--- bash-5.3.orig/builtins/Makefile.in	2024-11-11 11:51:48.000000000 -0500
++++ bash-5.3/builtins/Makefile.in	2026-03-17 17:12:39.787183344 -0400
+@@ -154,12 +154,12 @@
  	  $(srcdir)/reserved.def $(srcdir)/pushd.def $(srcdir)/shopt.def \
  	  $(srcdir)/printf.def $(srcdir)/complete.def $(srcdir)/mapfile.def
  
@@ -94,7 +62,7 @@ index 7e0ec324..b9a0680b 100644
  	evalstring.o exec.o exit.o fc.o fg_bg.o hash.o help.o history.o \
  	jobs.o kill.o let.o mapfile.o \
  	pushd.o read.o return.o set.o setattr.o shift.o source.o \
-@@ -237,6 +237,7 @@ mkbuiltins$(EXEEXT): mkbuiltins.o
+@@ -237,6 +237,7 @@
  mkbuiltins.o: mkbuiltins.c
  builtins.o: builtins.c
  common.o: common.c
@@ -102,7 +70,7 @@ index 7e0ec324..b9a0680b 100644
  bashgetopt.o: bashgetopt.c
  getopt.o: getopt.c
  evalstring.o: evalstring.c          
-@@ -484,7 +485,7 @@ exit.o: $(BASHINCDIR)/maxpath.h ./builtext.h ../pathnames.h
+@@ -484,7 +485,7 @@
  exit.o: $(BASHINCDIR)/unlocked-io.h
  fc.o: $(topdir)/bashtypes.h $(BASHINCDIR)/posixstat.h
  fc.o: $(topdir)/builtins.h $(topdir)/command.h $(srcdir)/bashgetopt.h
@@ -111,7 +79,7 @@ index 7e0ec324..b9a0680b 100644
  fc.o: $(topdir)/command.h ../config.h $(BASHINCDIR)/memalloc.h $(topdir)/error.h
  fc.o: $(topdir)/general.h $(topdir)/xmalloc.h $(BASHINCDIR)/maxpath.h
  fc.o: $(topdir)/quit.h $(topdir)/dispose_cmd.h $(topdir)/make_cmd.h $(topdir)/sig.h
-@@ -527,7 +528,7 @@ help.o: $(BASHINCDIR)/unlocked-io.h
+@@ -527,7 +528,7 @@
  history.o: $(topdir)/bashtypes.h
  history.o: $(topdir)/command.h ../config.h $(BASHINCDIR)/memalloc.h
  history.o: $(topdir)/error.h $(topdir)/general.h $(topdir)/xmalloc.h
@@ -120,7 +88,7 @@ index 7e0ec324..b9a0680b 100644
  history.o: $(topdir)/subst.h $(topdir)/externs.h $(topdir)/sig.h  $(topdir)/parser.h
  history.o: ${BASHINCDIR}/filecntl.h $(topdir)/shell.h $(topdir)/syntax.h $(topdir)/unwind_prot.h
  history.o: $(topdir)/variables.h $(topdir)/conftypes.h $(topdir)/bashhist.h $(BASHINCDIR)/maxpath.h
-@@ -730,6 +731,7 @@ break.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
+@@ -730,6 +731,7 @@
  caller.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  cd.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  common.c: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
@@ -128,11 +96,22 @@ index 7e0ec324..b9a0680b 100644
  complete.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  declare.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
  enable.o: ${topdir}/bashintl.h ${LIBINTL_H} $(BASHINCDIR)/gettext.h
-diff --git a/builtins/fc.def b/builtins/fc.def
-index 1d88a49a..85429c6c 100644
---- a/builtins/fc.def
-+++ b/builtins/fc.def
-@@ -23,7 +23,7 @@ $PRODUCES fc.c
+diff -ruN bash-5.3.orig/builtins/cd.def bash-5.3/builtins/cd.def
+--- bash-5.3.orig/builtins/cd.def	2024-09-28 16:25:22.000000000 -0400
++++ bash-5.3/builtins/cd.def	2026-03-17 17:12:39.790701744 -0400
+@@ -322,6 +322,8 @@
+ 	  return (EXECUTION_FAILURE);
+ 	}
+       lflag = 0;
++    } else if (strcmp(list->word->word, "...") == 0){
++      dirname = "../../";
+     }
+ #if defined (CD_COMPLAINS)
+   else if (list->next)
+diff -ruN bash-5.3.orig/builtins/fc.def bash-5.3/builtins/fc.def
+--- bash-5.3.orig/builtins/fc.def	2024-05-06 11:55:30.000000000 -0400
++++ bash-5.3/builtins/fc.def	2026-03-17 17:12:39.793809584 -0400
+@@ -23,7 +23,7 @@
  $BUILTIN fc
  $FUNCTION fc_builtin
  $DEPENDS_ON HISTORY
@@ -141,7 +120,7 @@ index 1d88a49a..85429c6c 100644
  Display or execute commands from the history list.
  
  fc is used to list or edit and re-execute commands from the history list.
-@@ -35,7 +35,9 @@ Options:
+@@ -35,7 +35,9 @@
    -e ENAME	select which editor to use.  Default is FCEDIT, then EDITOR,
  		then vi
    -l 	list lines instead of editing
@@ -151,7 +130,7 @@ index 1d88a49a..85429c6c 100644
    -r	reverse the order of the lines (newest listed first)
  
  With the `fc -s [pat=rep ...] [command]' format, COMMAND is
-@@ -83,6 +85,7 @@ $END
+@@ -83,6 +85,7 @@
  #include <readline/history.h>
  #include "bashgetopt.h"
  #include "common.h"
@@ -159,7 +138,7 @@ index 1d88a49a..85429c6c 100644
  
  #if !defined (errno)
  extern int errno;
-@@ -113,7 +116,7 @@ extern int suppress_debug_trap_verbose;
+@@ -113,7 +116,7 @@
  /* fc builtin command (fix command) for Bash for those who
     like K*rn-style history better than csh-style.
  
@@ -168,7 +147,7 @@ index 1d88a49a..85429c6c 100644
  
     FIRST and LAST can be numbers specifying the range, or FIRST can be
     a string, which means the most recent command beginning with that
-@@ -124,7 +127,9 @@ extern int suppress_debug_trap_verbose;
+@@ -124,7 +127,9 @@
        mode, then vi.
  
     -l means list lines instead of editing.
@@ -178,7 +157,21 @@ index 1d88a49a..85429c6c 100644
     -r means reverse the order of the lines (making it newest listed first).
  
       fc -e - [pat=rep ...] [command]
-@@ -193,23 +198,23 @@ fc_builtin (WORD_LIST *list)
+@@ -181,11 +186,11 @@
+ }
+ 
+ /* String to execute on a file that we want to edit. */
+-#define FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-vi}}"
++#define FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-$(command -v editor || echo vi)}}"
+ #if defined (STRICT_POSIX)
+ #  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-ed}"
+ #else
+-#  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-ed}}"
++#  define POSIX_FC_EDIT_COMMAND "${FCEDIT:-${EDITOR:-$(command -v editor || echo ed)}}"
+ #endif
+ 
+ int
+@@ -193,23 +198,23 @@
  {
    register int i;
    register char *sep;
@@ -206,7 +199,7 @@ index 1d88a49a..85429c6c 100644
      {
        switch (opt)
  	{
-@@ -229,6 +234,14 @@ fc_builtin (WORD_LIST *list)
+@@ -229,6 +234,14 @@
  	  execute = 1;
  	  break;
  
@@ -221,7 +214,7 @@ index 1d88a49a..85429c6c 100644
  	case 'e':
  	  ename = list_optarg;
  	  break;
-@@ -465,6 +478,8 @@ fc_builtin (WORD_LIST *list)
+@@ -465,6 +478,8 @@
  	}
      }
  
@@ -230,7 +223,7 @@ index 1d88a49a..85429c6c 100644
    for (i = reverse ? histend : histbeg; reverse ? i >= histbeg : i <= histend; reverse ? i-- : i++)
      {
        QUIT;
-@@ -472,15 +487,27 @@ fc_builtin (WORD_LIST *list)
+@@ -472,15 +487,27 @@
  	continue;
        if (numbering)
  	fprintf (stream, "%d", i + history_base);
@@ -260,11 +253,10 @@ index 1d88a49a..85429c6c 100644
      }
  
    if (listing)
-diff --git a/builtins/history.def b/builtins/history.def
-index 4c36416c..ca29e362 100644
---- a/builtins/history.def
-+++ b/builtins/history.def
-@@ -87,6 +87,7 @@ $END
+diff -ruN bash-5.3.orig/builtins/history.def bash-5.3/builtins/history.def
+--- bash-5.3.orig/builtins/history.def	2025-04-07 17:56:59.000000000 -0400
++++ bash-5.3/builtins/history.def	2026-03-17 17:12:39.787805504 -0400
+@@ -87,6 +87,7 @@
  #include <readline/history.h>
  #include "bashgetopt.h"
  #include "common.h"
@@ -272,7 +264,7 @@ index 4c36416c..ca29e362 100644
  
  #if !defined (errno)
  extern int errno;
-@@ -106,10 +107,6 @@ static int expand_and_print_history (WORD_LIST *);
+@@ -106,10 +107,6 @@
  #define CFLAG	0x40
  #define DFLAG	0x80
  
@@ -283,7 +275,7 @@ index 4c36416c..ca29e362 100644
  int
  history_builtin (WORD_LIST *list)
  {
-@@ -347,25 +344,6 @@ history_builtin (WORD_LIST *list)
+@@ -347,25 +344,6 @@
  #define histline(i) (hlist[(i)]->line)
  #define histdata(i) (hlist[(i)]->data)
  
@@ -309,7 +301,7 @@ index 4c36416c..ca29e362 100644
  static int
  display_history (WORD_LIST *list)
  {
-@@ -403,7 +381,7 @@ display_history (WORD_LIST *list)
+@@ -403,7 +381,7 @@
  	{
  	  QUIT;
  
@@ -318,11 +310,9 @@ index 4c36416c..ca29e362 100644
  	  printf ("%5d%c %s%s\n", i + history_base,
  		  histdata(i) ? '*' : ' ',
  		  ((timestr && *timestr) ? timestr : ""),
-diff --git a/builtins/histtime.c b/builtins/histtime.c
-new file mode 100644
-index 00000000..e2a5ede3
---- /dev/null
-+++ b/builtins/histtime.c
+diff -ruN bash-5.3.orig/builtins/histtime.c bash-5.3/builtins/histtime.c
+--- bash-5.3.orig/builtins/histtime.c	1969-12-31 19:00:00.000000000 -0500
++++ bash-5.3/builtins/histtime.c	2026-03-17 17:12:39.787991224 -0400
 @@ -0,0 +1,50 @@
 +/* histtime.c - a utility for history builtins */
 +
@@ -374,11 +364,9 @@ index 00000000..e2a5ede3
 +    strcpy (timestr, "??");
 +  return timestr;
 +}
-diff --git a/builtins/histtime.h b/builtins/histtime.h
-new file mode 100644
-index 00000000..5a6e3b30
---- /dev/null
-+++ b/builtins/histtime.h
+diff -ruN bash-5.3.orig/builtins/histtime.h bash-5.3/builtins/histtime.h
+--- bash-5.3.orig/builtins/histtime.h	1969-12-31 19:00:00.000000000 -0500
++++ bash-5.3/builtins/histtime.h	2026-03-17 17:12:39.788136704 -0400
 @@ -0,0 +1,21 @@
 +/* histtime.h -- extern declarations for functions defined in histtime.c. */
 +
@@ -401,11 +389,95 @@ index 00000000..5a6e3b30
 +*/
 +
 +extern char *builtin_histtime (HIST_ENTRY *, const char *);
-diff --git a/tests/builtins.right b/tests/builtins.right
-index d708c188..b052af06 100644
---- a/tests/builtins.right
-+++ b/tests/builtins.right
-@@ -373,7 +373,7 @@ A star (*) next to a name means that the command is disabled.
+diff -ruN bash-5.3.orig/config-bot.h bash-5.3/config-bot.h
+--- bash-5.3.orig/config-bot.h	2023-03-29 09:24:54.000000000 -0400
++++ bash-5.3/config-bot.h	2026-03-17 17:12:39.791073744 -0400
+@@ -193,4 +193,4 @@
+ /******************************************************************/
+ 
+ /* If you don't want bash to provide a default mail file to check. */
+-/* #undef DEFAULT_MAIL_DIRECTORY */
++#undef DEFAULT_MAIL_DIRECTORY
+diff -ruN bash-5.3.orig/config-top.h bash-5.3/config-top.h
+--- bash-5.3.orig/config-top.h	2024-10-24 14:14:21.000000000 -0400
++++ bash-5.3/config-top.h	2026-03-17 17:12:39.791461624 -0400
+@@ -58,7 +58,7 @@
+ /* The default value of the PATH variable. */
+ #ifndef DEFAULT_PATH_VALUE
+ #define DEFAULT_PATH_VALUE \
+-  "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
++  "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ #endif
+ 
+ /* If you want to unconditionally set a value for PATH in every restricted
+@@ -92,20 +92,20 @@
+ #define DEFAULT_BASHRC "~/.bashrc"
+ 
+ /* System-wide .bashrc file for interactive shells. */
+-/* #define SYS_BASHRC "/etc/bash.bashrc" */
++#define SYS_BASHRC "/etc/bash.bashrc"
+ 
+ /* System-wide .bash_logout for login shells. */
+-/* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */
++#define SYS_BASH_LOGOUT "/etc/bash.bash_logout"
+ 
+ /* Define this to make non-interactive shells begun with argv[0][0] == '-'
+    run the startup files when not in posix mode. */
+-/* #define NON_INTERACTIVE_LOGIN_SHELLS */
++#define NON_INTERACTIVE_LOGIN_SHELLS
+ 
+ /* Define this if you want bash to try to check whether it's being run by
+    sshd and source the .bashrc if so (like the rshd behavior).  This checks
+    for the presence of SSH_CLIENT or SSH2_CLIENT in the initial environment,
+    which can be fooled under certain not-uncommon circumstances. */
+-/* #define SSH_SOURCE_BASHRC */
++#define SSH_SOURCE_BASHRC
+ 
+ /* Define if you want the case-toggling operators (~[~]) and the
+    `capcase' variable attribute (declare -c). */
+diff -ruN bash-5.3.orig/examples/startup-files/Bash_aliases bash-5.3/examples/startup-files/Bash_aliases
+--- bash-5.3.orig/examples/startup-files/Bash_aliases	2019-12-10 14:56:36.000000000 -0500
++++ bash-5.3/examples/startup-files/Bash_aliases	2026-03-17 17:12:39.792085824 -0400
+@@ -41,20 +41,20 @@
+ { 
+     local count="$1" i;
+     shift;
+-    for i in $(seq 1 "$count");
++    for i in $(_seq 1 "$count");
+     do
+         eval "$@";
+     done
+ }
+ 
+ # Subfunction needed by `repeat'.
+-seq ()
++_seq ()
+ { 
+     local lower upper output;
+     lower=$1 upper=$2;
+ 
+     if [ $lower -ge $upper ]; then return; fi
+-    while [ $lower -le $upper ];
++    while [ $lower -lt $upper ];
+     do
+ 	echo -n "$lower "
+         lower=$(($lower + 1))
+diff -ruN bash-5.3.orig/input.c bash-5.3/input.c
+--- bash-5.3.orig/input.c	2025-02-09 16:41:29.000000000 -0500
++++ bash-5.3/input.c	2026-03-17 17:12:39.790261624 -0400
+@@ -520,7 +520,7 @@
+       if (nr == 0)
+ 	bp->b_flag |= B_EOF;
+       else
+-	bp->b_flag |= B_ERROR;
++	fatal_error("error reading input file: %s", strerror(errno));
+       return (EOF);
+     }
+ 
+diff -ruN bash-5.3.orig/tests/builtins.right bash-5.3/tests/builtins.right
+--- bash-5.3.orig/tests/builtins.right	2025-03-24 17:00:46.000000000 -0400
++++ bash-5.3/tests/builtins.right	2026-03-17 17:12:39.788414664 -0400
+@@ -373,7 +373,7 @@
   exit [n]                                typeset [-aAfFgiIlnrtux] name[=value>
   export [-fn] [name[=value] ...] or ex>  ulimit [-SHabcdefiklmnpqrstuvxPRT] [>
   false                                   umask [-p] [-S] [mode]
@@ -414,7 +486,7 @@ index d708c188..b052af06 100644
   fg [job_spec]                           unset [-f] [-v] [-n] [name ...]
   for NAME [in WORDS ... ] ; do COMMAND>  until COMMANDS; do COMMANDS-2; done
   for (( exp1; exp2; exp3 )); do COMMAN>  variables - Names and meanings of so>
-@@ -466,7 +466,7 @@ A star (*) next to a name means that the command is disabled.
+@@ -466,7 +466,7 @@
   exit [n]                                typeset [-aAfFgiIlnrtux] name[=value>
   export [-fn] [name[=value] ...] or ex>  ulimit [-SHabcdefiklmnpqrstuvxPRT] [>
   false                                   umask [-p] [-S] [mode]
@@ -423,10 +495,9 @@ index d708c188..b052af06 100644
   fg [job_spec]                           unset [-f] [-v] [-n] [name ...]
   for NAME [in WORDS ... ] ; do COMMAND>  until COMMANDS; do COMMANDS-2; done
   for (( exp1; exp2; exp3 )); do COMMAN>  variables - Names and meanings of so>
-diff --git a/tests/history.right b/tests/history.right
-index 5e1ab36b..fa5a9040 100644
---- a/tests/history.right
-+++ b/tests/history.right
+diff -ruN bash-5.3.orig/tests/history.right bash-5.3/tests/history.right
+--- bash-5.3.orig/tests/history.right	2025-04-09 16:01:07.000000000 -0400
++++ bash-5.3/tests/history.right	2026-03-17 17:12:39.788632664 -0400
 @@ -2,7 +2,7 @@
  history: usage: history [-c] [-d offset] [n] or history -anrw [filename] or history -ps arg [arg...]
  ./history.tests: line 19: history: cannot use more than one of -anrw
@@ -436,7 +507,7 @@ index 5e1ab36b..fa5a9040 100644
      1  for i in one two three; do echo $i; done
      2  /bin/sh -c 'echo this is $0'
      3  ls
-@@ -394,3 +394,42 @@ EOF
+@@ -394,3 +394,42 @@
  
  
      5  echo three
@@ -479,20 +550,17 @@ index 5e1ab36b..fa5a9040 100644
 +' >/dev/null
 +	 [prefix +0000]	echo x2 >/dev/null
 +	 [prefix +0000]	echo x1 >/dev/null
-diff --git a/tests/history.tests b/tests/history.tests
-index fd3f65aa..58ba13ba 100644
---- a/tests/history.tests
-+++ b/tests/history.tests
-@@ -135,3 +135,4 @@ ${THIS_SH} ./history6.sub
+diff -ruN bash-5.3.orig/tests/history.tests bash-5.3/tests/history.tests
+--- bash-5.3.orig/tests/history.tests	2025-04-09 16:01:00.000000000 -0400
++++ bash-5.3/tests/history.tests	2026-03-17 17:12:39.788809664 -0400
+@@ -135,3 +135,4 @@
  ${THIS_SH} ./history7.sub
  ${THIS_SH} ./history8.sub
  ${THIS_SH} ./history9.sub
 +${THIS_SH} ./history10.sub
-diff --git a/tests/history10.sub b/tests/history10.sub
-new file mode 100644
-index 00000000..536d9918
---- /dev/null
-+++ b/tests/history10.sub
+diff -ruN bash-5.3.orig/tests/history10.sub bash-5.3/tests/history10.sub
+--- bash-5.3.orig/tests/history10.sub	1969-12-31 19:00:00.000000000 -0500
++++ bash-5.3/tests/history10.sub	2026-03-17 17:12:39.788951944 -0400
 @@ -0,0 +1,57 @@
 +#   This program is free software: you can redistribute it and/or modify
 +#   it under the terms of the GNU General Public License as published by
@@ -551,102 +619,3 @@ index 00000000..536d9918
 + echo
 + echo testing timestamps...
 + builtin fc -lntr | format-output
--- 
-2.50.0
-
-# DP: Define PGRP_PIPE to avoid race condition.
-
---- a/input.c
-+++ b/input.c
-@@ -520,7 +520,7 @@ b_fill_buffer (BUFFERED_STREAM *bp)
-       if (nr == 0)
- 	bp->b_flag |= B_EOF;
-       else
--	bp->b_flag |= B_ERROR;
-+	fatal_error("error reading input file: %s", strerror(errno));
-       return (EOF);
-     }
- 
---- a/builtins/cd.def	2024-09-28 16:25:22.000000000 -0400
-+++ b/builtins/cd.def	2026-02-03 08:34:20.292479403 -0500
-@@ -322,6 +322,8 @@
- 	  return (EXECUTION_FAILURE);
- 	}
-       lflag = 0;
-+    } else if (strcmp(list->word->word, "...") == 0){
-+      dirname = "../../";
-     }
- #if defined (CD_COMPLAINS)
-   else if (list->next)
-# DP: Changed compile time configuration options:
-# DP: 
-# DP: - Set the default path to comply with Debian policy
-# DP: 
-# DP: - Enable System-wide .bashrc file for interactive shells.
-# DP: 
-# DP: - Enable System-wide .bash.logout  file for interactive shells.
-# DP: 
-# DP: - make non-interactive shells begun with argv[0][0] == '-'
-# DP:   run the startup files when not in posix mode.
-# DP: 
-# DP: - try to check whether bash is being run by sshd and source
-# DP:   the .bashrc if so (like the rshd behavior).
-# DP: 
-# DP: - don't define a default DEFAULT_MAIL_DIRECTORY, because it
-# DP:   can cause a timeout on NFS mounts.
-
---- a/config-bot.h
-+++ b/config-bot.h
-@@ -193,4 +193,4 @@
- /******************************************************************/
- 
- /* If you don't want bash to provide a default mail file to check. */
--/* #undef DEFAULT_MAIL_DIRECTORY */
-+#undef DEFAULT_MAIL_DIRECTORY
---- a/config-top.h
-+++ b/config-top.h
-@@ -63,7 +63,7 @@
- /* The default value of the PATH variable. */
- #ifndef DEFAULT_PATH_VALUE
- #define DEFAULT_PATH_VALUE \
--  "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
-+  "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
- #endif
-
- /* If you want to unconditionally set a value for PATH in every restricted
-@@ -92,20 +92,20 @@
- #define DEFAULT_BASHRC "~/.bashrc"
- 
- /* System-wide .bashrc file for interactive shells. */
--/* #define SYS_BASHRC "/etc/bash.bashrc" */
-+#define SYS_BASHRC "/etc/bash.bashrc"
- 
- /* System-wide .bash_logout for login shells. */
--/* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */
-+#define SYS_BASH_LOGOUT "/etc/bash.bash_logout"
- 
- /* Define this to make non-interactive shells begun with argv[0][0] == '-'
-    run the startup files when not in posix mode. */
--/* #define NON_INTERACTIVE_LOGIN_SHELLS */
-+#define NON_INTERACTIVE_LOGIN_SHELLS
- 
- /* Define this if you want bash to try to check whether it's being run by
-    sshd and source the .bashrc if so (like the rshd behavior).  This checks
-    for the presence of SSH_CLIENT or SSH2_CLIENT in the initial environment,
-    which can be fooled under certain not-uncommon circumstances. */
--/* #define SSH_SOURCE_BASHRC */
-+#define SSH_SOURCE_BASHRC
- 
- /* Define if you want the case-toggling operators (~[~]) and the
-    `capcase' variable attribute (declare -c). */
---- a/bashansi.h
-+++ b/bashansi.h
-@@ -36,7 +36,7 @@
- #endif /* !HAVE_STDLIB_H */
- 
- /* If bool is not a compiler builtin, prefer stdbool.h if we have it */
--#if !defined (HAVE_C_BOOL)
-+#if !defined (HAVE_C_BOOL) && !(defined (__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
- #  if defined (HAVE_STDBOOL_H)
- #    include <stdbool.h>
- #  else

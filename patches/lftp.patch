@@ -1,0 +1,23 @@
+diff -ruN lftp-4.9.3.orig/m4/needtrio.m4 lftp-4.9.3/m4/needtrio.m4
+--- lftp-4.9.3.orig/m4/needtrio.m4	2024-01-31 03:57:49.000000000 -0500
++++ lftp-4.9.3/m4/needtrio.m4	2026-03-17 17:05:10.980339184 -0400
+@@ -9,6 +9,7 @@
+       else
+ 
+       AC_RUN_IFELSE([AC_LANG_SOURCE([[
++#include <stdio.h>
+ 	 #include <stdio.h>
+ 	 int main()
+ 	 {
+diff -ruN lftp-4.9.3.orig/src/ftpclass.cc lftp-4.9.3/src/ftpclass.cc
+--- lftp-4.9.3.orig/src/ftpclass.cc	2022-02-24 11:27:37.000000000 -0500
++++ lftp-4.9.3/src/ftpclass.cc	2026-03-17 17:05:10.981157184 -0400
+@@ -651,7 +651,7 @@
+       }
+    } else {
+       char *path1=alloca_strdup(path); // to split it
+-      char *path2=alloca_strdup(path); // to re-assemble
++      char *path2=alloca_strdup2(path, 2); // to re-assemble + add space for potential ~/ prefix
+       if(AbsolutePath(path)) {
+ 	 if(real_cwd && !strncmp(real_cwd,path,real_cwd.length())
+ 	 && path[real_cwd.length()]=='/') {

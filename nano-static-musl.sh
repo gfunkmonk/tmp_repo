@@ -18,28 +18,22 @@ setup_cleanup
 install_host_deps
 download_source "nano" "${NANO_VERSION}" "${NANO_TARBALL}" "${NANO_MIRRORS[@]}"
 setup_alpine_chroot "${NANO_TARBALL}"
-copy_patches "nano-8.7.1-colors.patch"
+copy_patches "nano-colors.patch"
 setup_qemu
 mount_chroot
 
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-sed \
-make \
-gcc \
 pkgconfig \
 ncurses-dev \
 ncurses-static \
-python3-dev \
-perl-dev \
-perl \
 linux-headers && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf ${NANO_TARBALL} && \
 cd nano-${NANO_VERSION}/ && \
-patch -p1 --fuzz=4 < ../nano-8.7.1-colors.patch && \
+patch -p1 --fuzz=4 < ../nano-colors.patch && \
 ./configure CC='gcc' \
   --sysconfdir=/etc --disable-nls --disable-utf8 --disable-tiny \
   --enable-nanorc --enable-color --enable-extra --enable-largefile \

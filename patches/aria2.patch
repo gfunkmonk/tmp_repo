@@ -1,8 +1,7 @@
-diff --git a/src/BufferedFile.cc b/src/BufferedFile.cc
-index fe1b977..60994d4 100644
---- a/src/BufferedFile.cc
-+++ b/src/BufferedFile.cc
-@@ -86,7 +86,7 @@ int BufferedFile::onClose()
+diff -ruN aria2-1.37.0.orig/src/BufferedFile.cc aria2-1.37.0/src/BufferedFile.cc
+--- aria2-1.37.0.orig/src/BufferedFile.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/BufferedFile.cc	2026-03-17 17:15:26.166064264 -0400
+@@ -86,7 +86,7 @@
  #else  // __MINGW32__
      _commit(fileno(fp_));
  #endif // __MINGW32__
@@ -11,11 +10,10 @@ index fe1b977..60994d4 100644
        rv = fclose(fp_);
      }
      fp_ = nullptr;
-diff --git a/src/DownloadCommand.cc b/src/DownloadCommand.cc
-index 2db41e4..129005a 100644
---- a/src/DownloadCommand.cc
-+++ b/src/DownloadCommand.cc
-@@ -306,10 +306,16 @@ void DownloadCommand::checkLowestDownloadSpeed() const
+diff -ruN aria2-1.37.0.orig/src/DownloadCommand.cc aria2-1.37.0/src/DownloadCommand.cc
+--- aria2-1.37.0.orig/src/DownloadCommand.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/DownloadCommand.cc	2026-03-17 17:15:26.166289824 -0400
+@@ -306,10 +306,16 @@
            startupIdleTime_) {
      int nowSpeed = peerStat_->calculateDownloadSpeed();
      if (nowSpeed <= lowestDownloadSpeedLimit_) {
@@ -33,11 +31,10 @@ index 2db41e4..129005a 100644
      }
    }
  }
-diff --git a/src/HttpResponse.cc b/src/HttpResponse.cc
-index 500cd64..b38311c 100644
---- a/src/HttpResponse.cc
-+++ b/src/HttpResponse.cc
-@@ -68,7 +68,7 @@ namespace aria2 {
+diff -ruN aria2-1.37.0.orig/src/HttpResponse.cc aria2-1.37.0/src/HttpResponse.cc
+--- aria2-1.37.0.orig/src/HttpResponse.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/HttpResponse.cc	2026-03-17 17:15:26.166540464 -0400
+@@ -68,7 +68,7 @@
  
  HttpResponse::HttpResponse() : cuid_{0} {}
  
@@ -46,7 +43,7 @@ index 500cd64..b38311c 100644
  {
    int statusCode = getStatusCode();
    switch (statusCode) {
-@@ -78,21 +78,23 @@ void HttpResponse::validateResponse() const
+@@ -78,21 +78,23 @@
        // compare the received range against the requested range
        auto responseRange = httpHeader_->getRange();
        if (!httpRequest_->isRangeSatisfied(responseRange)) {
@@ -78,7 +75,7 @@ index 500cd64..b38311c 100644
    case 300: // Multiple Choices
    case 301: // Moved Permanently
    case 302: // Found
-@@ -103,13 +105,16 @@ void HttpResponse::validateResponse() const
+@@ -103,13 +105,16 @@
        throw DL_ABORT_EX2(fmt(EX_LOCATION_HEADER_REQUIRED, statusCode),
                           error_code::HTTP_PROTOCOL_ERROR);
      }
@@ -99,11 +96,10 @@ index 500cd64..b38311c 100644
  }
  
  std::string HttpResponse::determineFilename(bool contentDispositionUTF8) const
-diff --git a/src/HttpResponse.h b/src/HttpResponse.h
-index 2caffaf..6480ca4 100644
---- a/src/HttpResponse.h
-+++ b/src/HttpResponse.h
-@@ -62,7 +62,7 @@ private:
+diff -ruN aria2-1.37.0.orig/src/HttpResponse.h aria2-1.37.0/src/HttpResponse.h
+--- aria2-1.37.0.orig/src/HttpResponse.h	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/HttpResponse.h	2026-03-17 17:15:26.166723784 -0400
+@@ -62,7 +62,7 @@
  public:
    HttpResponse();
  
@@ -112,10 +108,9 @@ index 2caffaf..6480ca4 100644
  
    /**
     * Returns filename.
-diff --git a/src/HttpResponseCommand.cc b/src/HttpResponseCommand.cc
-index 6e2a01d..35e74d8 100644
---- a/src/HttpResponseCommand.cc
-+++ b/src/HttpResponseCommand.cc
+diff -ruN aria2-1.37.0.orig/src/HttpResponseCommand.cc aria2-1.37.0/src/HttpResponseCommand.cc
+--- aria2-1.37.0.orig/src/HttpResponseCommand.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/HttpResponseCommand.cc	2026-03-17 17:15:26.166939704 -0400
 @@ -51,16 +51,19 @@
  #include "DefaultBtProgressInfoFile.h"
  #include "DownloadFailureException.h"
@@ -136,7 +131,7 @@ index 6e2a01d..35e74d8 100644
  #include "LogFactory.h"
  #include "CookieStorage.h"
  #include "AuthConfigFactory.h"
-@@ -154,7 +157,47 @@ bool HttpResponseCommand::executeInternal()
+@@ -154,7 +157,47 @@
    }
  
    // check HTTP status code
@@ -185,11 +180,10 @@ index 6e2a01d..35e74d8 100644
    httpResponse->retrieveCookie();
  
    const auto& httpHeader = httpResponse->getHttpHeader();
-diff --git a/src/HttpSkipResponseCommand.cc b/src/HttpSkipResponseCommand.cc
-index a722d77..f629465 100644
---- a/src/HttpSkipResponseCommand.cc
-+++ b/src/HttpSkipResponseCommand.cc
-@@ -204,7 +204,7 @@ bool HttpSkipResponseCommand::processResponse()
+diff -ruN aria2-1.37.0.orig/src/HttpSkipResponseCommand.cc aria2-1.37.0/src/HttpSkipResponseCommand.cc
+--- aria2-1.37.0.orig/src/HttpSkipResponseCommand.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/HttpSkipResponseCommand.cc	2026-03-17 17:15:26.167165264 -0400
+@@ -204,7 +204,7 @@
    auto statusCode = httpResponse_->getStatusCode();
    if (statusCode >= 400) {
      switch (statusCode) {
@@ -198,7 +192,7 @@ index a722d77..f629465 100644
        if (getOption()->getAsBool(PREF_HTTP_AUTH_CHALLENGE) &&
            !httpResponse_->getHttpRequest()->authenticationUsed() &&
            getDownloadEngine()->getAuthConfigFactory()->activateBasicCred(
-@@ -213,16 +213,42 @@ bool HttpSkipResponseCommand::processResponse()
+@@ -213,16 +213,42 @@
          return prepareForRetry(0);
        }
        throw DL_ABORT_EX2(EX_AUTH_FAILED, error_code::HTTP_AUTH_FAILED);
@@ -245,7 +239,7 @@ index a722d77..f629465 100644
        // a good idea.
        if (getOption()->getAsInt(PREF_RETRY_WAIT) > 0) {
          throw DL_RETRY_EX2(fmt(EX_BAD_STATUS, statusCode),
-@@ -230,12 +256,16 @@ bool HttpSkipResponseCommand::processResponse()
+@@ -230,12 +256,16 @@
        }
        throw DL_ABORT_EX2(fmt(EX_BAD_STATUS, statusCode),
                           error_code::HTTP_SERVICE_UNAVAILABLE);
@@ -264,11 +258,10 @@ index a722d77..f629465 100644
      throw DL_ABORT_EX2(fmt(EX_BAD_STATUS, statusCode),
                         error_code::HTTP_PROTOCOL_ERROR);
    }
-diff --git a/src/OptionHandlerFactory.cc b/src/OptionHandlerFactory.cc
-index 2cd2c43..d7bc2dc 100644
---- a/src/OptionHandlerFactory.cc
-+++ b/src/OptionHandlerFactory.cc
-@@ -158,7 +158,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+diff -ruN aria2-1.37.0.orig/src/OptionHandlerFactory.cc aria2-1.37.0/src/OptionHandlerFactory.cc
+--- aria2-1.37.0.orig/src/OptionHandlerFactory.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/OptionHandlerFactory.cc	2026-03-17 17:15:26.167520184 -0400
+@@ -158,7 +158,7 @@
    }
    {
      OptionHandler* op(new BooleanOptionHandler(
@@ -277,7 +270,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_BASIC);
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
-@@ -432,7 +432,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -432,7 +432,7 @@
    {
      OptionHandler* op(new NumberOptionHandler(PREF_MAX_CONCURRENT_DOWNLOADS,
                                                TEXT_MAX_CONCURRENT_DOWNLOADS,
@@ -286,7 +279,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_BASIC);
      op->setChangeGlobalOption(true);
      handlers.push_back(op);
-@@ -440,7 +440,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -440,7 +440,7 @@
    {
      OptionHandler* op(new NumberOptionHandler(PREF_MAX_CONNECTION_PER_SERVER,
                                                TEXT_MAX_CONNECTION_PER_SERVER,
@@ -295,7 +288,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_BASIC);
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
-@@ -501,7 +501,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -501,7 +501,7 @@
    }
    {
      OptionHandler* op(new UnitNumberOptionHandler(
@@ -304,7 +297,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_BASIC);
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
-@@ -834,7 +834,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -834,7 +834,7 @@
    }
    {
      OptionHandler* op(new NumberOptionHandler(
@@ -313,7 +306,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
      op->setInitialOption(true);
-@@ -905,7 +905,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -905,7 +905,7 @@
    }
    {
      OptionHandler* op(new UnitNumberOptionHandler(
@@ -322,7 +315,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_ADVANCED);
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
-@@ -925,8 +925,8 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -925,8 +925,8 @@
      handlers.push_back(op);
    }
    {
@@ -333,11 +326,10 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
      op->setInitialOption(true);
-@@ -934,6 +934,66 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
-     op->setChangeOptionForReserved(true);
+@@ -935,6 +935,66 @@
      handlers.push_back(op);
    }
-+  {
+   {
 +      OptionHandler* op(new BooleanOptionHandler(
 +              PREF_RETRY_ON_LOWEST_SPEED, TEXT_RETRY_ON_LOWEST_SPEED, A2_V_FALSE, OptionHandler::OPT_ARG));
 +      op->addTag(TAG_ADVANCED);
@@ -397,10 +389,11 @@ index 2cd2c43..d7bc2dc 100644
 +      op->setChangeOptionForReserved(true);
 +      handlers.push_back(op);
 +  }
-   {
++  {
      OptionHandler* op(new BooleanOptionHandler(
          PREF_REUSE_URI, TEXT_REUSE_URI, A2_V_TRUE, OptionHandler::OPT_ARG));
-@@ -971,7 +1031,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+     op->addTag(TAG_FTP);
+@@ -971,7 +1031,7 @@
    }
    {
      OptionHandler* op(
@@ -409,7 +402,7 @@ index 2cd2c43..d7bc2dc 100644
      op->addTag(TAG_BASIC);
      op->addTag(TAG_FTP);
      op->addTag(TAG_HTTP);
-@@ -1286,7 +1346,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
+@@ -1286,7 +1346,7 @@
    }
    {
      OptionHandler* op(new LocalFilePathOptionHandler(
@@ -418,11 +411,10 @@ index 2cd2c43..d7bc2dc 100644
          /* acceptStdin = */ false, 0, /* mustExist = */ false));
      handlers.push_back(op);
    }
-diff --git a/src/OptionHandlerImpl.cc b/src/OptionHandlerImpl.cc
-index 6214e84..f64b47e 100644
---- a/src/OptionHandlerImpl.cc
-+++ b/src/OptionHandlerImpl.cc
-@@ -548,7 +548,7 @@ void LocalFilePathOptionHandler::parseArg(Option& option,
+diff -ruN aria2-1.37.0.orig/src/OptionHandlerImpl.cc aria2-1.37.0/src/OptionHandlerImpl.cc
+--- aria2-1.37.0.orig/src/OptionHandlerImpl.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/OptionHandlerImpl.cc	2026-03-17 17:15:26.168024544 -0400
+@@ -548,7 +548,7 @@
      option.put(pref_, DEV_STDIN);
    }
    else {
@@ -431,10 +423,23 @@ index 6214e84..f64b47e 100644
      if (mustExist_) {
        File f(path);
        std::string err;
-diff --git a/src/SocketBuffer.cc b/src/SocketBuffer.cc
-index 62862ff..eed3c33 100644
---- a/src/SocketBuffer.cc
-+++ b/src/SocketBuffer.cc
+diff -ruN aria2-1.37.0.orig/src/Platform.cc aria2-1.37.0/src/Platform.cc
+--- aria2-1.37.0.orig/src/Platform.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/Platform.cc	2026-03-17 17:15:26.170461024 -0400
+@@ -122,7 +122,9 @@
+   // RC4 is in the legacy provider.
+   legacy_provider_ = OSSL_PROVIDER_load(nullptr, "legacy");
+   if (!legacy_provider_) {
+-    throw DL_ABORT_EX("OSSL_PROVIDER_load 'legacy' failed.");
++    // Legacy provider (.so) cannot be loaded in a fully static binary.
++    // Modern TLS via the default provider is still available.
++    ERR_clear_error();
+   }
+ 
+   default_provider_ = OSSL_PROVIDER_load(nullptr, "default");
+diff -ruN aria2-1.37.0.orig/src/SocketBuffer.cc aria2-1.37.0/src/SocketBuffer.cc
+--- aria2-1.37.0.orig/src/SocketBuffer.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/SocketBuffer.cc	2026-03-17 17:15:26.168254464 -0400
 @@ -39,6 +39,7 @@
  
  #include "SocketCore.h"
@@ -443,7 +448,7 @@ index 62862ff..eed3c33 100644
  #include "message.h"
  #include "fmt.h"
  #include "LogFactory.h"
-@@ -158,7 +159,7 @@ ssize_t SocketBuffer::send()
+@@ -158,7 +159,7 @@
      }
      ssize_t slen = socket_->writeVector(iov, num);
      if (slen == 0 && !socket_->wantRead() && !socket_->wantWrite()) {
@@ -452,11 +457,10 @@ index 62862ff..eed3c33 100644
      }
      // A2_LOG_NOTICE(fmt("num=%zu, amount=%d, bufq.size()=%zu, SEND=%d",
      //                   num, amount, bufq_.size(), slen));
-diff --git a/src/SocketCore.cc b/src/SocketCore.cc
-index 4e7421b..9f24da8 100644
---- a/src/SocketCore.cc
-+++ b/src/SocketCore.cc
-@@ -1016,7 +1016,7 @@ bool SocketCore::tlsHandshake(TLSContext* tlsctx, const std::string& hostname)
+diff -ruN aria2-1.37.0.orig/src/SocketCore.cc aria2-1.37.0/src/SocketCore.cc
+--- aria2-1.37.0.orig/src/SocketCore.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/SocketCore.cc	2026-03-17 17:15:26.168491584 -0400
+@@ -1016,7 +1016,7 @@
  
      if (rv == TLS_ERR_ERROR) {
        // Damn those error.
@@ -465,11 +469,10 @@ index 4e7421b..9f24da8 100644
                              handshakeError.empty()
                                  ? tlsSession_->getLastErrorString().c_str()
                                  : handshakeError.c_str()));
-diff --git a/src/option_processing.cc b/src/option_processing.cc
-index a671b23..ba95443 100644
---- a/src/option_processing.cc
-+++ b/src/option_processing.cc
-@@ -319,6 +319,22 @@ error_code::Value option_processing(Option& op, bool standalone,
+diff -ruN aria2-1.37.0.orig/src/option_processing.cc aria2-1.37.0/src/option_processing.cc
+--- aria2-1.37.0.orig/src/option_processing.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/option_processing.cc	2026-03-17 17:15:26.168811984 -0400
+@@ -319,6 +319,22 @@
      }
    }
    if (standalone && op.getAsBool(PREF_DAEMON)) {
@@ -492,7 +495,7 @@ index a671b23..ba95443 100644
  #if defined(__GNUC__) && defined(__APPLE__)
  // daemon() is deprecated on OSX since... forever.
  // Silence the warning for good, so that -Werror becomes feasible.
-@@ -334,6 +350,7 @@ error_code::Value option_processing(Option& op, bool standalone,
+@@ -334,6 +350,7 @@
        perror(MSG_DAEMON_FAILED);
        return error_code::UNKNOWN_ERROR;
      }
@@ -500,11 +503,10 @@ index a671b23..ba95443 100644
    }
    if (op.getAsBool(PREF_DEFERRED_INPUT) && op.defined(PREF_SAVE_SESSION)) {
      A2_LOG_WARN("--deferred-input is disabled because of the presence of "
-diff --git a/src/prefs.cc b/src/prefs.cc
-index 2591b9f..cdeb20d 100644
---- a/src/prefs.cc
-+++ b/src/prefs.cc
-@@ -326,6 +326,18 @@ PrefPtr PREF_ENABLE_ASYNC_DNS6 = makePref("enable-async-dns6");
+diff -ruN aria2-1.37.0.orig/src/prefs.cc aria2-1.37.0/src/prefs.cc
+--- aria2-1.37.0.orig/src/prefs.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/prefs.cc	2026-03-17 17:15:26.169037744 -0400
+@@ -326,6 +326,18 @@
  PrefPtr PREF_MAX_DOWNLOAD_RESULT = makePref("max-download-result");
  // value: 1*digit
  PrefPtr PREF_RETRY_WAIT = makePref("retry-wait");
@@ -523,11 +525,10 @@ index 2591b9f..cdeb20d 100644
  // value: string
  PrefPtr PREF_ASYNC_DNS_SERVER = makePref("async-dns-server");
  // value: true | false
-diff --git a/src/prefs.h b/src/prefs.h
-index 338fd6e..861b010 100644
---- a/src/prefs.h
-+++ b/src/prefs.h
-@@ -279,6 +279,18 @@ extern PrefPtr PREF_ENABLE_ASYNC_DNS6;
+diff -ruN aria2-1.37.0.orig/src/prefs.h aria2-1.37.0/src/prefs.h
+--- aria2-1.37.0.orig/src/prefs.h	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/prefs.h	2026-03-17 17:15:26.169267904 -0400
+@@ -279,6 +279,18 @@
  extern PrefPtr PREF_MAX_DOWNLOAD_RESULT;
  // value: 1*digit
  extern PrefPtr PREF_RETRY_WAIT;
@@ -546,10 +547,9 @@ index 338fd6e..861b010 100644
  // value: string
  extern PrefPtr PREF_ASYNC_DNS_SERVER;
  // value: true | false
-diff --git a/src/usage_text.h b/src/usage_text.h
-index 4868456..47b4fce 100644
---- a/src/usage_text.h
-+++ b/src/usage_text.h
+diff -ruN aria2-1.37.0.orig/src/usage_text.h aria2-1.37.0/src/usage_text.h
+--- aria2-1.37.0.orig/src/usage_text.h	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/usage_text.h	2026-03-17 17:15:26.169589104 -0400
 @@ -64,6 +64,32 @@
    _(" --retry-wait=SEC             Set the seconds to wait between retries. \n" \
      "                              With SEC > 0, aria2 will retry download when the\n" \
@@ -593,11 +593,10 @@ index 4868456..47b4fce 100644
      "                              0 means aria2 does not have a lowest speed limit.\n" \
      "                              You can append K or M(1K = 1024, 1M = 1024K).\n" \
      "                              This option does not affect BitTorrent downloads.")
-diff --git a/src/util.cc b/src/util.cc
-index 07502c0..e6da18f 100644
---- a/src/util.cc
-+++ b/src/util.cc
-@@ -1805,9 +1805,12 @@ std::string getXDGDir(const std::string& environmentVariable,
+diff -ruN aria2-1.37.0.orig/src/util.cc aria2-1.37.0/src/util.cc
+--- aria2-1.37.0.orig/src/util.cc	2023-11-15 04:49:41.000000000 -0500
++++ aria2-1.37.0/src/util.cc	2026-03-17 17:15:26.170084104 -0400
+@@ -1805,9 +1805,12 @@
  
  std::string getConfigFile()
  {
@@ -612,7 +611,7 @@ index 07502c0..e6da18f 100644
                 "/aria2/aria2.conf";
    }
    return filename;
-@@ -1816,9 +1819,12 @@ std::string getConfigFile()
+@@ -1816,9 +1819,12 @@
  std::string getDHTFile(bool ipv6)
  {
    std::string filename =
@@ -627,17 +626,3 @@ index 07502c0..e6da18f 100644
                 (ipv6 ? "/aria2/dht6.dat" : "/aria2/dht.dat");
    }
    return filename;
-diff --git a/src/Platform.cc b/src/Platform.cc
---- a/src/Platform.cc
-+++ b/src/Platform.cc
-@@ -122,7 +122,9 @@ bool Platform::setUp()
-   // RC4 is in the legacy provider.
-   legacy_provider_ = OSSL_PROVIDER_load(nullptr, "legacy");
-   if (!legacy_provider_) {
--    throw DL_ABORT_EX("OSSL_PROVIDER_load 'legacy' failed.");
-+    // Legacy provider (.so) cannot be loaded in a fully static binary.
-+    // Modern TLS via the default provider is still available.
-+    ERR_clear_error();
-   }
- 
-   default_provider_ = OSSL_PROVIDER_load(nullptr, "default");

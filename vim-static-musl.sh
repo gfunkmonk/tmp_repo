@@ -22,6 +22,7 @@ setup_cleanup
 install_host_deps
 download_source "vim" "${VIM_VERSION}" "${VIM_TARBALL}" "${VIM_MIRRORS[@]}"
 setup_alpine_chroot "${VIM_TARBALL}"
+copy_patches "vim.patch"
 setup_qemu
 mount_chroot
 
@@ -29,18 +30,15 @@ sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 sed \
-make \
-gcc \
+patch \
 pkgconfig \
 ncurses-dev \
-ncurses-static \
-python3-dev \
-perl-dev \
-perl && \
+ncurses-static && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \
+patch -p1 --fuzz=4 < ../vim.patch && \
 sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
 ./configure CC='gcc' \
   --disable-channel --disable-gpm --disable-gtktest --disable-gui \
@@ -48,8 +46,8 @@ sed -i 's#emsg(_(e_failed_to_source_defaults));#(void)0;#g' src/main.c && \
   --disable-sysmouse --disable-xsmp \
   --enable-multibyte \
   --with-features=huge --with-tlib=ncursesw --without-x \
-  LDFLAGS='-static' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -static -fno-stack-protector -no-pie' && \
+  LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie' && \
 CC='gcc' make -j\$(nproc) && \
 strip src/vim && \
 ../upx --ultra-brute src/vim"

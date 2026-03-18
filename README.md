@@ -7,17 +7,22 @@ Build scripts that produce fully static, multi-architecture binaries using musl 
 | Tool | Version | Description |
 |------|---------|-------------|
 | aria2c | latest | Multi-protocol download utility |
-| axel | 2.17.14 | Parallel download accelerator |
+| axel | latest | Parallel download accelerator |
 | bash | 5.3 | Bash (Bourne Again SHell) |
-| bsdtar | 3.8.5 | Archive tool (libarchive) |
-| curl | 8.18.0 | Data transfer tool |
+| bsdtar | latest | Archive tool (libarchive) |
+| curl | latest | Data transfer tool |
 | dash | 0.5.13.1 | POSIX shell |
+| htop | latest | Interactive process viewer |
 | lftp | 4.9.3 | Command line ftp client |
-| oksh | 7.8 | OpenBSD ksh shell |
+| nano | 8.7.1 | Small command-line text editor |
+| oksh | latest | OpenBSD ksh shell |
+| openssh | 10.2p1 | OpenSSH ssh client |
+| pigz | 2.8 | Parallel implementation of GZip |
 | tar | 1.35 | GNU tar archive utility |
-| vim | 9.2.0119 | Text editor |
+| upx | custom | UPX w/ zstd support |
+| vim | latest | Text editor |
 | wget | 1.25.0 | File downloader |
-| xz | 5.8.2 | XZ/LZMA compression |
+| xz | latest | XZ/LZMA compression |
 
 ## Architectures
 

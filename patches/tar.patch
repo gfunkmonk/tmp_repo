@@ -1,0 +1,118 @@
+diff -ruN tar-1.35.orig/configure tar-1.35/configure
+--- tar-1.35.orig/configure	2023-07-18 02:39:11.000000000 -0400
++++ tar-1.35/configure	2026-03-17 16:54:44.315009104 -0400
+@@ -30386,7 +30386,8 @@
+ else $as_nop
+   ac_have_decl=0
+ fi
+-printf "%s\n" "#define HAVE_DECL_FDOPENDIR $ac_have_decl" >>confdefs.h
++printf "%s\n" "#define HAVE_DECL_FDOPENDIR 0" >>confdefs.h
++ac_have_decl=0
+ if test $ac_have_decl = 1
+ then :
+ 
+@@ -30394,7 +30395,8 @@
+   HAVE_DECL_FDOPENDIR=0
+ fi
+ 
+-
++ac_cv_func_fdopendir="no"
++printf "%s\n" "#define HAVE_FDOPENDIR 0" >>confdefs.h
+   if test $ac_cv_func_fdopendir = no; then
+     HAVE_FDOPENDIR=0
+   else
+diff -ruN tar-1.35.orig/gnu/getrandom.c tar-1.35/gnu/getrandom.c
+--- tar-1.35.orig/gnu/getrandom.c	2023-04-18 03:41:35.000000000 -0400
++++ tar-1.35/gnu/getrandom.c	2026-03-17 16:54:44.305604184 -0400
+@@ -19,6 +19,7 @@
+ 
+ #include <config.h>
+ 
++#include <stddef.h>
+ #include <sys/random.h>
+ 
+ #include <errno.h>
+diff -ruN tar-1.35.orig/src/Makefile.in tar-1.35/src/Makefile.in
+--- tar-1.35.orig/src/Makefile.in	2023-07-18 02:39:15.000000000 -0400
++++ tar-1.35/src/Makefile.in	2026-03-17 16:54:44.320548224 -0400
+@@ -1793,7 +1793,8 @@
+ tar_LDADD = $(LIBS) ../lib/libtar.a ../gnu/libgnu.a\
+  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIB_EACCESS)\
+  $(LIB_GETRANDOM) $(LIB_HARD_LOCALE) $(FILE_HAS_ACL_LIB) $(LIB_MBRTOWC)\
+- $(LIB_SELINUX) $(LIB_SETLOCALE_NULL)
++ $(LIB_SELINUX) $(LIB_SETLOCALE_NULL) \
++ $(LIBINTL) $(LIBICONV)
+ 
+ all: all-am
+ 
+diff -ruN tar-1.35.orig/src/buffer.c tar-1.35/src/buffer.c
+--- tar-1.35.orig/src/buffer.c	2023-07-10 03:29:17.000000000 -0400
++++ tar-1.35/src/buffer.c	2026-03-17 16:54:44.307850784 -0400
+@@ -987,8 +987,7 @@
+     }
+ 
+   record_end = record_start + (record_size - left) / BLOCKSIZE;
+-  if (left == 0)
+-    records_read++;
++  records_read++;
+ }
+ 
+ /*  Flush the current buffer to/from the archive.  */
+diff -ruN tar-1.35.orig/src/create.c tar-1.35/src/create.c
+--- tar-1.35.orig/src/create.c	2023-07-10 09:43:02.000000000 -0400
++++ tar-1.35/src/create.c	2026-03-17 16:54:44.307019064 -0400
+@@ -380,7 +380,7 @@
+ mode_to_chars (mode_t v, char *p, size_t s)
+ {
+   /* In the common case where the internal and external mode bits are the same,
+-     and we are not using POSIX or GNU format,
++     and we are not using POSIX or GNU formats,
+      propagate all unknown bits to the external mode.
+      This matches historical practice.
+      Otherwise, just copy the bits we know about.  */
+@@ -392,6 +392,7 @@
+       && S_IROTH == TOREAD && S_IWOTH == TOWRITE && S_IXOTH == TOEXEC
+       && archive_format != POSIX_FORMAT
+       && archive_format != USTAR_FORMAT
++      && archive_format != OLDGNU_FORMAT
+       && archive_format != GNU_FORMAT)
+     {
+       negative = v < 0;
+diff -ruN tar-1.35.orig/src/extract.c tar-1.35/src/extract.c
+--- tar-1.35.orig/src/extract.c	2023-07-10 06:13:55.000000000 -0400
++++ tar-1.35/src/extract.c	2026-03-17 16:54:44.319749464 -0400
+@@ -256,6 +256,8 @@
+ static int
+ fd_chmod(int fd, char const *file_name, int mode, int atflag, int typeflag)
+ {
++  if (atflag == AT_SYMLINK_NOFOLLOW && typeflag == SYMTYPE)
++      return 0;
+   int chmod_errno = fd_i_chmod (fd, file_name, mode, atflag) == 0 ? 0 : errno;
+ 
+   /* On Solaris, chmod may fail if we don't have PRIV_ALL, because
+diff -ruN tar-1.35.orig/tests/Makefile.am tar-1.35/tests/Makefile.am
+--- tar-1.35.orig/tests/Makefile.am	2023-07-10 13:01:57.000000000 -0400
++++ tar-1.35/tests/Makefile.am	2026-03-17 16:54:44.305826224 -0400
+@@ -334,4 +334,5 @@
+ LDADD = ../gnu/libgnu.a\
+  $(LIB_ACL) $(LIB_CLOCK_GETTIME) $(LIB_EACCESS)\
+  $(LIB_GETRANDOM) $(LIB_HARD_LOCALE) $(FILE_HAS_ACL_LIB) $(LIB_MBRTOWC)\
+- $(LIB_SELINUX) $(LIB_SETLOCALE_NULL)
++ $(LIB_SELINUX) $(LIB_SETLOCALE_NULL) \
++ $(LIBINTL) $(LIBICONV)
+diff -ruN tar-1.35.orig/tests/delete06.at tar-1.35/tests/delete06.at
+--- tar-1.35.orig/tests/delete06.at	2023-07-10 03:29:18.000000000 -0400
++++ tar-1.35/tests/delete06.at	2026-03-17 16:54:44.308378264 -0400
+@@ -36,7 +36,10 @@
+ dd if=archive.tar of=trunc.tar bs=$size count=1 2>/dev/null
+ tar --delete 'b/' -f trunc.tar
+ ],
+-[0],
+-[],[],[],[],[gnu, pax])
++[2],
++[],
++[tar: lseek: trunc.tar: Value too large for defined data type
++tar: Exiting with failure status due to previous errors
++],[],[],[gnu, pax])
+ 
+ AT_CLEANUP

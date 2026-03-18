@@ -20,10 +20,14 @@ on:
           - bsdtar
           - curl
           - dash
+          - htop
           - lftp
           - nano
           - oksh
+          - openssh
+          - pigz
           - tar
+          - upx
           - vim
           - wget
           - xz
@@ -44,7 +48,7 @@ jobs:
         id: set-matrix
         run: |
           if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.tool }}" == "all" || "${{ inputs.tool }}" == "" ]]; then
-            echo 'matrix=["aria2c","axel","bsdtar","curl","dash","lftp","nano","oksh","tar","vim","wget","xz"]' >> "$GITHUB_OUTPUT"
+            echo 'matrix=["aria2c","axel","bsdtar","curl","dash","htop","lftp","nano","oksh","openssh","pigz","tar","upx","vim","wget","xz"]' >> "$GITHUB_OUTPUT"
           else
             echo 'matrix=["${{ inputs.tool }}"]' >> "$GITHUB_OUTPUT"
           fi
@@ -62,7 +66,7 @@ jobs:
         arch: [x86_64, x86, aarch64, armv7]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Determine tool version
       id: tool-version
@@ -104,7 +108,7 @@ jobs:
             echo "CCACHE Environment set!"
             
     - name: Set up ccache
-      uses: hendrikmuhs/ccache-action@v1.2
+      uses: hendrikmuhs/ccache-action@main
       with:
         create-symlink: true
         key: ccache-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-${{ hashFiles(format('{0}-static-musl.sh', matrix.tool)) }}
@@ -114,7 +118,7 @@ jobs:
         max-size: 3G
 
     - name: Cache tarballs
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           *.tar.gz
@@ -152,7 +156,7 @@ jobs:
         echo "TOOL_VERSION=${version}" >> "$GITHUB_ENV"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ steps.artifact-info.outputs.name }}
         path: ${{ steps.artifact-info.outputs.file }}

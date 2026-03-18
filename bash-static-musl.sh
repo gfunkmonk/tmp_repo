@@ -66,14 +66,14 @@ download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
 download_bash_upstream_patches
 setup_alpine_chroot "${BASH_TARBALL}"
 cp -r "${BASH_PATCH_DIR}" ./pasta/
-copy_patches "bash-5.3_my.patch"
+copy_patches "bash.patch"
 setup_qemu
 mount_chroot
 
 sudo chroot "${CHROOT_DIR}/" /bin/sh -s <<EOF
 set -e
 apk update
-apk add build-base musl-dev ccache sed make gcc automake autoconf pkgconfig ncurses-dev ncurses-static python3-dev perl-dev perl gettext-dev gettext-static readline readline-static
+apk add build-base musl-dev ccache sed automake autoconf pkgconfig ncurses-dev ncurses-static perl gettext-dev gettext-static readline readline-static
 mkdir -p /ccache
 export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH
 chmod 755 upx
@@ -84,11 +84,11 @@ while read -r patch; do
   patch -p0 < ../${BASH_PATCH_DIR}/"\$patch"
 done < ../${BASH_PATCH_DIR}/.patch-list
 echo -e "${BOYSENBERRY}= applying bash-5.3_my.patch${NC}"
-patch -p1 --fuzz=4 < ../bash-5.3_my.patch
+patch -p1 --fuzz=4 < ../bash.patch
 ./configure CC='gcc' \
   --disable-nls --without-bash-malloc --with-curses --enable-static-link \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie'
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie -Wno-discarded-qualifiers'
 CC='gcc' make -j\$(nproc)
 strip bash
 ../upx --ultra-brute bash
