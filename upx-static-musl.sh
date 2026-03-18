@@ -2,7 +2,7 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
-echo -e "${VIOLET}= fetching latest curl version${NC}"
+echo -e "${VIOLET}= fetching latest upx version${NC}"
 UPX_VERSION=$(curl -fsSL "https://api.github.com/repos/gfunkmonk/upx/releases/latest" | grep '"tag_name"' \
   | sed 's/.*"release-\([^"]*\)".*/\1/' | sed 's/_/./g' | grep '":' | sed 's/"tag.name": "//g' \
   | sed 's/",//g' | sed 's/  //g') || true
@@ -12,7 +12,7 @@ if [ -z "${UPX_VERSION}" ]; then
 fi
 
 PACKAGE_VERSION="${UPX_VERSION}"
-UPX_TARBALL="curl-${UPX_VERSION}.tar.gz"
+UPX_TARBALL="upx-${UPX_VERSION}.tar.gz"
 UPX_MIRRORS=(
   "https://github.com/gfunkmonk/upx/archive/refs/tags/${UPX_VERSION}.tar.gz"
   "https://github.com/gfunkmonk/upx/archive/refs/tags/${UPX_VERSION}.tar.gz"
