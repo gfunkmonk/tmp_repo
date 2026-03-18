@@ -74,14 +74,15 @@ zstd-dev \
 zstd-static \
 git \
 cmake \
-clang && \
+clang \
+ninja-build \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 git clone http://github.com/gfunkmonk/upx upx-${UPX_VERSION} --depth=1 && \
 cd upx-${UPX_VERSION}/ && \
 git submodule init && git submodule update && \
 mkdir build && cd build/ && \
-cmake -DUPX_CONFIG_DISABLE_WSTRICT=ON -DUPX_CONFIG_DISABLE_WERROR=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXE_LINKER_FLAGS='-Wl,--gc-sections -static' -DCMAKE_C_FLAGS='-Os -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_CXX_FLAGS='-Os -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' .. && \
-make -j\$(nproc) LDFLAGS='-static -all-static' && \
+cmake -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections -static" -DCMAKE_C_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_CXX_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_BUILD_TYPE=Release -DUPX_CONFIG_DISABLE_GITREV=ON -G Ninja .. && \
+ninja -j\$(nproc) LDFLAGS='-static -all-static' && \
 strip upx && \
 cp upx upx1 && \
 ./upx1 --lzma upx"
