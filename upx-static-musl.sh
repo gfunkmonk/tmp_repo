@@ -81,7 +81,7 @@ git clone http://github.com/gfunkmonk/upx upx-${UPX_VERSION} --depth=1 && \
 cd upx-${UPX_VERSION}/ && \
 git submodule init && git submodule update && \
 mkdir build && cd build/ && \
-cmake -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections -static" -DCMAKE_C_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_CXX_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_BUILD_TYPE=Release -DUPX_CONFIG_DISABLE_GITREV=ON -G Ninja .. && \
+cmake -G Ninja -DCMAKE_EXE_LINKER_FLAGS="-Wl,--gc-sections -static" -DCMAKE_C_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_CXX_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_BUILD_TYPE=Release -DUPX_CONFIG_DISABLE_GITREV=ON -DUPX_CONFIG_DISABLE_WSTRICT=ON .. && \
 ninja -j\$(nproc) LDFLAGS='-static -all-static' && \
 strip upx && \
 cp upx upx1 && \
