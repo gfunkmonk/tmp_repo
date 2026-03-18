@@ -53,7 +53,6 @@ mkdir -p pasta
 tar xf "${TARBALL}" -C pasta/
 echo -e "${PEACH}= copy resolv.conf and tools into chroot${NC}"
 cp /etc/resolv.conf ./pasta/etc/
-cp tools/upx/upx-${ARCH} pasta/upx
 
 if [ -n "${QEMU_ARCH}" ]; then
   echo -e "${TAWNY}= setup QEMU for cross-arch builds${NC}"
@@ -69,29 +68,14 @@ sudo mount --rbind /sys "./pasta/sys/"
 sudo chroot ./pasta/ /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
-openssl-dev \
-openssl-libs-static \
-nghttp2-dev \
-nghttp2-static \
-libssh2-dev \
-libssh2-static \
 zlib-dev \
 zlib-static \
 zstd-dev \
 zstd-static \
-autoconf \
-automake \
-libunistring-static \
-libunistring-dev \
-libidn2-static \
-libidn2-dev \
-libpsl-static \
-libpsl-dev \
 git \
 cmake \
 clang && \
 mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
-chmod 755 upx && \
 git clone http://github.com/gfunkmonk/upx upx-${UPX_VERSION} --depth=1 && \
 cd upx-${UPX_VERSION}/ && \
 git submodule init && git submodule update && \
@@ -99,6 +83,7 @@ mkdir build && cd build/ && \
 cmake -DUPX_CONFIG_DISABLE_WSTRICT=ON -DUPX_CONFIG_DISABLE_WERROR=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXE_LINKER_FLAGS='-Wl,--gc-sections -static' -DCMAKE_C_FLAGS='-Os -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' -DCMAKE_CXX_FLAGS='-Os -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' .. && \
 make -j\$(nproc) LDFLAGS='-static -all-static' && \
 strip upx && \
-../upx --lzma upx"
+cp upx upx1 && \
+./upx1 --lzma upx"
 
 package_output "upx" "./pasta/upx-${UPX_VERSION}/build/upx"
