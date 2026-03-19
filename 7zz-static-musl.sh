@@ -83,7 +83,7 @@ cd CPP/7zip/Bundles/Alone2 && \
 mkdir -p b/g && \
 make -j\$(nproc) \
   CFLAGS_BASE_LIST='-c -D_7ZIP_AFFINITY_DISABLE=1 -DZ7_AFFINITY_DISABLE=1 -D_GNU_SOURCE=1' \
-  CFLAGS_WARN_WALL='-Wall -Wextra' \$MAKE_OPTS PLATFORM=\$PLATFORM \$EXTRA_FLAGS \
+  CFLAGS_WARN_WALL='-Wall -Wextra' \$MAKE_OPTS PLATFORM=\$PLATFORM COMPL_STATIC=1 \
   CC='gcc -Os -static -ffunction-sections -fdata-sections' \
   CXX='g++ -Os -static -ffunction-sections -fdata-sections' && \
 find . -type f -name '7zzs' -exec cp -va {} 7zz \; ; [ -f 7zz ] || find . -mindepth 2 -type f -name '7zz' | head -n 1 | xargs -I{} cp -va {} 7zz ; [ -f 7zz ] || { echo \"Error: 7zzs or 7zz binary not found after build\" >&2; exit 1; } && \
