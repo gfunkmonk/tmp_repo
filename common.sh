@@ -138,7 +138,7 @@ mount_chroot() {
   echo -e "${VIOLET}= mount, bind and chroot into dir${NC}"
   sudo mount -t proc none "./pasta/proc/"
   sudo mount --rbind /dev "./pasta/dev/"
-  sudo mount -t devpts devpts "./pasta/dev/pts" -o nosuid,noexec
+  sudo mount -t devpts devpts "./pasta/dev/pts"
   #sudo mount --rbind /dev/pts "./pasta/dev/pts"
   #sudo mount -t sysfs sys "./pasta/sys/"
   sudo mount --rbind /sys "./pasta/sys/"
