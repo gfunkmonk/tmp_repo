@@ -75,7 +75,7 @@ cd CPP/7zip/Bundles/Alone2 && \
 mkdir -p b/g && \
 make -j\$(nproc) \
   CFLAGS_BASE_LIST='-c -D_7ZIP_AFFINITY_DISABLE=1 -DZ7_AFFINITY_DISABLE=1 -D_GNU_SOURCE=1' \
-  CFLAGS_WARN_WALL='-Wall -Wextra' COMPL_STATIC=1 $MAKE_OPTS $PLATFORM \
+  CFLAGS_WARN_WALL='-Wall -Wextra' COMPL_STATIC=1 $MAKE_OPTS PLATFOM='$PLATFORM' \
   CC='gcc -Os -static -ffunction-sections -fdata-sections' \
   CXX='g++ -Os -static -ffunction-sections -fdata-sections' && \
 strip b/g/7zzs && \
