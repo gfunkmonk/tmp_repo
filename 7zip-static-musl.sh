@@ -62,4 +62,4 @@ strip b/g/7zzs && \
 cp b/g/7zzs /7-Zip-zstd-${SEVENZIP_SHORT}/7zz && \
 /upx --lzma /7-Zip-zstd-${SEVENZIP_SHORT}/7zz"
 
-package_output "7zz" "./pasta/7-Zip-zstd-${SEVENZIP_SHORT}/7zz"
+package_output "7zip" "./pasta/7-Zip-zstd-${SEVENZIP_SHORT}/7zz"
