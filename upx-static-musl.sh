@@ -42,15 +42,14 @@ cd upx-${UPX_VERSION}/ && \
 git submodule init && git submodule update && \
 mkdir build && cd build/ && \
 cmake -G Ninja \
-  -DCMAKE_EXE_LINKER_FLAGS='-Wl,--gc-sections -static -s -w -flto' \
-  -DCMAKE_C_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -flto -fno-unwind-tables -fno-asynchronous-unwind-tables' \
-  -DCMAKE_CXX_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -flto -fno-unwind-tables -fno-asynchronous-unwind-tables' \
+  -DCMAKE_EXE_LINKER_FLAGS='-Wl,--gc-sections -static' \
+  -DCMAKE_C_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' \
+  -DCMAKE_CXX_FLAGS_RELEASE='-Os -DNDEBUG -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector' \
   -DCMAKE_BUILD_TYPE=Release \
   -DUPX_CONFIG_DISABLE_GITREV=ON \
   -DUPX_CONFIG_DISABLE_WSTRICT=ON \
   -DUSE_STRICT_DEFAULTS=OFF \
   -DUPX_CONFIG_REQUIRE_THREADS=ON \
-  -DUPX_CONFIG_DISABLE_SHARED_LIBS=ON \
   -S .. && \
 ninja -j\$(nproc) && \
 strip upx && \

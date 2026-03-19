@@ -49,7 +49,8 @@ setup_cleanup() {
     sudo umount -lf "./pasta/dev/pts"  2>/dev/null || true
     sudo umount -lf "./pasta/dev"  2>/dev/null || true
     sudo umount -lf "./pasta/sys"  2>/dev/null || true
-  }
+    sudo umount -lf "./pasta/sys"  2>/dev/null || true
+	  }
   trap cleanup EXIT
 }
 
