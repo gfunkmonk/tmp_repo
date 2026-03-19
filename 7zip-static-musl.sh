@@ -29,7 +29,7 @@ mount_chroot
 # Map repo ARCH to 7zip Linux makefile; source extracts flat so we wrap in a versioned dir
 case "${ARCH}" in
   x86_64)  MAKE_OPTS="MY_ASM=/usr/bin/uasm -f ../../cmpl_gcc.mak 7z_asm=uasm";;
-  x86)     MAKE_OPTS="MY_ASM=/usr/bin/uasm -f ../../cmpl_gcc_x86.mak 7z_asm=uasm";;
+  x86)     MAKE_OPTS="MY_ASM=/usr/bin/uasm -f ../../cmpl_gcc.mak 7z_asm=uasm";;
   aarch64) MAKE_OPTS="-f ../../cmpl_gcc_arm64.mak";;
   armv7)   MAKE_OPTS="-f ../../cmpl_gcc_arm.mak";;
 esac
