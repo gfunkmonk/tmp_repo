@@ -80,8 +80,7 @@ make -j\$(nproc) \
   CFLAGS_WARN_WALL='-Wall -Wextra' \$MAKE_OPTS PLATFORM=\$PLATFORM COMPL_STATIC=1 \
   CC='gcc -Os -static -ffunction-sections -fdata-sections' \
   CXX='g++ -Os -static -ffunction-sections -fdata-sections' && \
-binary=$(find . \( -name '7zzs' -o -name '7zz' \) -type f | head -n1)
-[ -n "$binary" ] || { echo "Error: binary not found" >&2; exit 1; } && \
+find . -type f -name '7zzs' -exec cp -va {} 7zz \; ; [ -f 7zz ] || find . -mindepth 2 -type f -name '7zz' | head -n 1 | xargs -I{} cp -va {} 7zz ; [ -f 7zz ] || { echo \"Error: 7zzs or 7zz binary not found after build\" >&2; exit 1; } && \
 cp -va "$binary" 7zz
 strip 7zz && \
 cp 7zz /7-Zip-zstd-${SEVENZIP_SHORT}/7zz && \
@@ -89,4 +88,3 @@ cp 7zz /7-Zip-zstd-${SEVENZIP_SHORT}/7zz && \
 
 package_output "7zz" "./pasta/7-Zip-zstd-${SEVENZIP_SHORT}/7zz"
 
-# find . -type f -name '7zzs' -exec cp -va {} 7zz \; ; [ -f 7zz ] || find . -mindepth 2 -type f -name '7zz' | head -n 1 | xargs -I{} cp -va {} 7zz ; [ -f 7zz ] || { echo \"Error: 7zzs or 7zz binary not found after build\" >&2; exit 1; } && \
