@@ -62,9 +62,10 @@ gh_latest_release() {
 # setup_cleanup: register unmount trap for chroot bind mounts
 setup_cleanup() {
   cleanup() {
-    sudo umount -lf "./pasta/proc" 2>/dev/null || true
-    sudo umount -R "./pasta/dev"  2>/dev/null || true
-    sudo umount -R "./pasta/sys"  2>/dev/null || true
+    sudo umount -lfR "./pasta/proc" 2>/dev/null || true
+    sudo umount -lfR "./pasta/dev/pts" 2>/dev/null || true
+    sudo umount -lfR "./pasta/dev"  2>/dev/null || true
+    sudo umount -lfR "./pasta/sys"  2>/dev/null || true
 	  }
   trap cleanup EXIT
 }
