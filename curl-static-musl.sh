@@ -10,7 +10,7 @@ if [ -z "${CURL_VERSION}" ]; then
 fi
 
 PACKAGE_VERSION="${CURL_VERSION}"
-CURL_GIT_VER="$(echo ${CURL_VERSION} | sed 's/\./_/g')"
+CURL_GIT_VER="${CURL_VERSION//./_}"
 CURL_TARBALL="curl-${CURL_VERSION}.tar.xz"
 CURL_MIRRORS=(
   "https://curl.se/download/curl-${CURL_VERSION}.tar.xz"

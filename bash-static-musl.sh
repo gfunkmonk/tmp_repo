@@ -10,7 +10,6 @@ BASH_MAJOR_MINOR="${bash_major}${bash_minor}"
 BASH_PATCH_DIR="bash-${BASH_VERSION}-patches"
 BASH_PATCH_PREFIX="bash${BASH_MAJOR_MINOR}-"
 BASH_PATCH_URL="https://ftp.gnu.org/gnu/bash/${BASH_PATCH_DIR}/"
-CHROOT_DIR="./"${CHROOTDIR}""
 BASH_MIRRORS=(
   "https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz"
   "https://mirrors.ocf.berkeley.edu/gnu/bash/bash-${BASH_VERSION}.tar.gz"
@@ -70,7 +69,7 @@ copy_patches "bash.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot "${CHROOT_DIR}/" /bin/sh -s <<EOF
+sudo chroot "${CHROOTDIR}/" /bin/sh -s <<EOF
 set -e
 apk update
 apk add build-base musl-dev ccache sed automake autoconf pkgconfig ncurses-dev ncurses-static perl gettext-dev gettext-static readline readline-static
@@ -94,4 +93,4 @@ strip bash
 ../upx --ultra-brute bash
 EOF
 
-package_output "bash" "${CHROOT_DIR}/bash-${BASH_VERSION}/bash"
+package_output "bash" "${CHROOTDIR}/bash-${BASH_VERSION}/bash"
