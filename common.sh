@@ -91,11 +91,11 @@ download_source() {
   local label="$1" version="$2" tarball="$3"
   shift 3
   if [ ! -d distfiles/ ]; then
-    echo -e "$HOTPINKdistfiles dir does not exist. Creating it now."
+    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.${NC}"
     mkdir -p distfiles/
   fi
-  if [ -f "${tarball}" ]; then
-    echo -e "${SLATE}= ${label}-${version}: ${tarball} already cached, skipping download${NC}"
+  if [ -f "distfiles/${tarball}" ]; then
+    echo -e "${SLATE}= ${label}-${version}: distfiles/${tarball} already cached, skipping download${NC}"
     return 0
   fi
   echo -e "${AQUA}= downloading ${label}-${version} tarball${NC}"
@@ -121,13 +121,13 @@ download_source() {
 # setup_alpine_chroot TARBALL
 # Downloads Alpine rootfs, extracts it, and copies resolv.conf + source tarball inside.
 setup_alpine_chroot() {
-  if [ -d ./${CHROOTDIR}/ ]; then
+  if [ -d "./${CHROOTDIR}/" ]; then
     echo -e "${CORAL}chroot dir exist! Removing it now.${NC}"
-    rm -fr ./${CHROOTDIR}/
+    rm -fr "./${CHROOTDIR}/"
   fi
   local tarball="$1"
   if [ ! -d distfiles/ ]; then
-    echo -e "$HOTPINKdistfiles dir does not exist. Creating it now."
+    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.${NC}"
     mkdir -p distfiles/
   fi
   if [ -f distfiles/"${TARBALL}" ]; then
@@ -139,8 +139,8 @@ setup_alpine_chroot() {
       || { echo -e "${TOMATO}= ERROR: failed to download Alpine rootfs${NC}" >&2; exit 1; }
   fi
   echo -e "${SKY}= extract rootfs${NC}"
-  mkdir -p ${CHROOTDIR}
-  tar xf distfiles/"${TARBALL}" -C ${CHROOTDIR}/
+  mkdir -p "${CHROOTDIR}"
+  tar xf distfiles/"${TARBALL}" -C "${CHROOTDIR}"/
   echo -e "${PEACH}= copy resolv.conf and ${tarball} into chroot${NC}"
   cp /etc/resolv.conf ./${CHROOTDIR}/etc/
   cp distfiles/"${tarball}" "./${CHROOTDIR}/${tarball}"

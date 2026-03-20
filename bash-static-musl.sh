@@ -10,7 +10,7 @@ BASH_MAJOR_MINOR="${bash_major}${bash_minor}"
 BASH_PATCH_DIR="bash-${BASH_VERSION}-patches"
 BASH_PATCH_PREFIX="bash${BASH_MAJOR_MINOR}-"
 BASH_PATCH_URL="https://ftp.gnu.org/gnu/bash/${BASH_PATCH_DIR}/"
-CHROOT_DIR="./"${CHROOTDIR}""
+CHROOT_DIR="./${CHROOTDIR}"
 BASH_MIRRORS=(
   "https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz"
   "https://mirrors.ocf.berkeley.edu/gnu/bash/bash-${BASH_VERSION}.tar.gz"
