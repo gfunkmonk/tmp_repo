@@ -152,24 +152,24 @@ setup_alpine_chroot() {
     rm -fr "./${CHROOTDIR}/"
   fi
   local tarball="$1"
-  if [ ! -d distfiles/ ]; then
+  if [ ! -d chrootfiles/ ]; then
     echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.${NC}"
-    mkdir -p distfiles/
+    mkdir -p chrootfiles/
   fi
-  if [ -f distfiles/"${TARBALL}" ]; then
+  if [ -f chrootfiles/"${TARBALL}" ]; then
     echo -e "${SLATE}= Alpine rootfs ${TARBALL} already cached, skipping download${NC}"
   else
     echo -e "${HELIOTROPE}= download alpine rootfs${NC}"
     "${CURL}" -fsSL --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120 \
-      -o distfiles/"${TARBALL}" "${ALPINE_URL}" \
+      -o chrootfiles/"${TARBALL}" "${ALPINE_URL}" \
       || { echo -e "${TOMATO}= ERROR: failed to download Alpine rootfs${NC}" >&2; exit 1; }
   fi
   echo -e "${SKY}= extract rootfs${NC}"
   mkdir -p "${CHROOTDIR}"
-  tar xf distfiles/"${TARBALL}" -C "${CHROOTDIR}"/
+  tar xf chrootfiles/"${TARBALL}" -C "${CHROOTDIR}"/
   echo -e "${PEACH}= copy resolv.conf and ${tarball} into chroot${NC}"
   cp /etc/resolv.conf ./${CHROOTDIR}/etc/
-  cp distfiles/"${tarball}" "./${CHROOTDIR}/${tarball}"
+  cp chrootfiles/"${tarball}" "./${CHROOTDIR}/${tarball}"
   if [[ ! -f "tools/upx/upx-${ARCH}" ]]; then
     echo -e "${TOMATO}= ERROR: tools/upx/upx-${ARCH} not found${NC}"
     exit 1

@@ -126,8 +126,8 @@ jobs:
       uses: actions/cache@v5
       with:
         path: |
-          *.tar.gz
-          *.tar.xz
+          distfiles/*.tar.gz
+          distfiles/*.tar.xz
         key: build-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-${{ hashFiles(format('{0}-static-musl.sh', matrix.tool)) }}
         restore-keys: |
           build-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-
@@ -135,7 +135,7 @@ jobs:
     - name: cache Alpine rootfs
       uses: actions/cache@v5
       with:
-        path: alpine-minirootfs-*.tar.gz
+        path: chrootfiles/alpine-minirootfs-*.tar.gz
         key: alpine-rootfs-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}
 
     - name: Build ${{ matrix.tool }} for ${{ matrix.arch }}
