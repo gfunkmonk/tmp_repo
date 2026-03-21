@@ -231,8 +231,7 @@ setup_qemu() {
 # Validates CCACHE_DIR exists before mounting.
 mount_chroot() {
   echo -e "${VIOLET}= mount, bind and chroot into dir${NC}"
-  local ccachelogdir
-  ccachelogdir=$(ccache -p 2>/dev/null | grep log_file | cut -d "=" -f2 | rev | cut -d'/' -f2- | rev) || true
+  export CCACHELOGDIR=$(ccache -p 2>/dev/null | grep log_file | cut -d "=" -f2 | rev | cut -d'/' -f2- | rev) || true
   sudo mount --rbind /dev "./${CHROOTDIR}/dev/"
   sudo mount --make-rslave "./${CHROOTDIR}/dev/"
   sudo mount -t proc none "./${CHROOTDIR}/proc/"
@@ -241,13 +240,10 @@ mount_chroot() {
   if [ -n "${CCACHE_DIR:-}" ] && [ -d "${CCACHE_DIR}" ]; then
     sudo mkdir -p "./${CHROOTDIR}/${CCACHE_CHROOT_DIR}"
     sudo mount --bind "${CCACHE_DIR}" "./${CHROOTDIR}/${CCACHE_CHROOT_DIR}"
-    [ -n "${ccachelogdir}" ] && sudo mkdir -p "./${CHROOTDIR}/${ccachelogdir}"
   fi
-  if [ -n "${CCACHE_DIR:-}" ]; then
-    if [ ! -d "${CCACHE_DIR}" ]; then
-      echo -e "${TOMATO}= ERROR: CCACHE_DIR is set but directory does not exist: ${CCACHE_DIR}${NC}" >&2
-      exit 1
-    fi
+  if [ ! -d "${CCACHELOGDIR}" ]; then
+    sudo mkdir -p "./${CHROOTDIR}/var/log/ccache/"
+  fi
 }
 
 # run_build_setup TOOL VERSION TARBALL [PATCH...] -- MIRROR [MIRROR...]
