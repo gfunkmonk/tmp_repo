@@ -53,7 +53,7 @@ autoreconf -i -f && \
 ./configure CC=gcc CXX=g++ LIBS='-l:libreadline.a -l:libncursesw.a' \
   --with-openssl --without-gnutls --enable-static --enable-threads=posix --disable-nls --disable-shared \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -std=c17 -Os -Wno-unterminated-string-initialization -Wno-deprecated-declarations -no-pie' \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -std=c17 -Wno-unterminated-string-initialization -Wno-deprecated-declarations -no-pie' \
   CXXFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -std=c++14 -Wno-deprecated-declarations -Wno-error=template-id-cdtor' && \
 make -j\$(nproc) LDFLAGS='-static -all-static -Wl,--gc-sections' && \
 strip src/lftp && \

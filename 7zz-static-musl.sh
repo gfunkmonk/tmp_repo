@@ -45,6 +45,7 @@ case "${ARCH}" in
      ;;
   *)
      MAKE_OPTS="-f ../../cmpl_gcc.mak"
+     PLATFORM=""
 esac
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -s <<EOF
