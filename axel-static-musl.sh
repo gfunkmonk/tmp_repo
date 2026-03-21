@@ -17,7 +17,7 @@ AXEL_MIRRORS=(
   "https://bos.us.distfiles.macports.org/axel/axel-${AXEL_VERSION}.tar.xz"
   "http://download.nus.edu.sg/mirror/gentoo/distfiles/d5/axel-${AXEL_VERSION}.tar.xz"
   "https://mse.uk.distfiles.macports.org/axel/axel-${AXEL_VERSION}.tar.xz"
-  "https://mirror.ismdeep.com/axel/v2.17.14/axel-${AXEL_VERSION}.tar.xz"
+  "https://mirror.ismdeep.com/axel/v${AXEL_VERSION}/axel-${AXEL_VERSION}.tar.xz"
   "https://code.opensuse.org/package/axel/blob/master/f/axel-${AXEL_VERSION}.tar.xz"
 )
 

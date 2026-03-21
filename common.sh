@@ -51,7 +51,7 @@ setup_tools() {
   if [[ -x "${CURL}" ]]; then
     : # use bundled curl
   elif command -v curl >/dev/null 2>&1; then
-    echo -e "${LEMON}= bundled curl not found, falling back to system curl${NC}"
+    echo -e "${LEMON}= bundled curl not found, falling back to system curl${NC}" >&2
     CURL="curl"
   else
     echo -e "${TOMATO}= ERROR: no curl available (checked ${CURL} and PATH)${NC}" >&2
@@ -91,6 +91,7 @@ gh_latest_release() {
 gh_latest_tag() {
     local repo="$1" filter="${2:-.[0].name}"
     "${CURL}" -fsSL --connect-timeout 10 --max-time 30 \
+        ${GITHUB_TOKEN:+-H "Authorization: Bearer ${GITHUB_TOKEN}"} \
         "https://api.github.com/repos/${repo}/tags" \
         | "${JQ}" -r "${filter} // empty"
 }
@@ -98,9 +99,9 @@ gh_latest_tag() {
 # setup_cleanup: register unmount trap for chroot bind mounts
 setup_cleanup() {
   cleanup() {
-    echo -e "${CAMEL}Umounting filesystems from chroot -- $CHROOTDIR${NC}"
+    echo -e "${CAMEL}Unmounting filesystems from chroot -- $CHROOTDIR${NC}"
     grep "$(pwd)/${CHROOTDIR}" /proc/mounts | cut -f2 -d" " | sort -r | xargs -r sudo umount -nl || true
-	  }
+  }
   trap cleanup EXIT
 }
 

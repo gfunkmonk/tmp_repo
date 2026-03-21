@@ -67,7 +67,7 @@ jobs:
         arch: [x86_64, x86, aarch64, armv7]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v4
 
     - name: read Alpine version
       run: |
@@ -145,7 +145,7 @@ jobs:
         echo "TOOL_VERSION=${version}" >> "$GITHUB_ENV"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.artifact-info.outputs.name }}
         path: ${{ steps.artifact-info.outputs.file }}
