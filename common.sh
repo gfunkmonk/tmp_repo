@@ -40,19 +40,19 @@ INDIGO="\033[38;2;111;0;255m"
 NC="\033[0m"
 
 setup_tools() {
-  if [[ -x "${JQ}" ]]; then
+  if [[ -x "${JQ}" ]] && "${JQ}" --version >/dev/null 2>&1; then
     : # use bundled jq
   elif command -v jq >/dev/null 2>&1; then
-    echo -e "${LEMON}= bundled jq binary not found, falling back to system jq${NC}" >&2
+    echo -e "${LEMON}= bundled jq not usable on this arch, falling back to system jq${NC}" >&2
     JQ="jq"
   else
     echo -e "${TOMATO}= ERROR: no jq binary available (checked ${JQ} and PATH)${NC}" >&2
     exit 1
   fi
-  if [[ -x "${CURL}" ]]; then
+  if [[ -x "${CURL}" ]] && "${CURL}" --version >/dev/null 2>&1; then
     : # use bundled curl
   elif command -v curl >/dev/null 2>&1; then
-    echo -e "${LEMON}= bundled curl not found, falling back to system curl${NC}" >&2
+    echo -e "${LEMON}= bundled curl not usable on this arch, falling back to system curl${NC}" >&2
     CURL="curl"
   else
     echo -e "${TOMATO}= ERROR: no curl available (checked ${CURL} and PATH)${NC}" >&2

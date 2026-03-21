@@ -57,7 +57,7 @@ jobs:
 
   build:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
       CCACHE_CHROOT_DIR: /ccache
@@ -66,6 +66,15 @@ jobs:
       matrix:
         tool: ${{ fromJson(needs.setup.outputs.matrix) }}
         arch: [x86_64, x86, aarch64, armv7]
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: x86
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+          - arch: armv7
+            runner: ubuntu-24.04-arm
 
     steps:
     - uses: actions/checkout@v6
