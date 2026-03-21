@@ -26,7 +26,7 @@ copy_patches "vim.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 sed \
@@ -52,4 +52,4 @@ CC='gcc' make -j\$(nproc) && \
 strip src/vim && \
 ../upx --ultra-brute src/vim"
 
-package_output "vim" "./"${CHROOTDIR}"/vim-${VIM_VERSION}/src/vim"
+package_output "vim" "./${CHROOTDIR}/vim-${VIM_VERSION}/src/vim"

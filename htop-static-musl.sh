@@ -25,7 +25,7 @@ copy_patches "htop.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 pkgconfig \
@@ -49,4 +49,4 @@ CC='gcc' make -j\$(nproc) && \
 strip htop && \
 ../upx --lzma htop"
 
-package_output "htop" "./"${CHROOTDIR}"/htop-${HTOP_VERSION}/htop"
+package_output "htop" "./${CHROOTDIR}/htop-${HTOP_VERSION}/htop"

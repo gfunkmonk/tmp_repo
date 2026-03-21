@@ -29,7 +29,7 @@ copy_patches "aria2.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 openssl-dev \
@@ -67,4 +67,4 @@ make -j\$(nproc) && \
 strip src/aria2c && \
 ../upx --lzma src/aria2c"
 
-package_output "aria2c" "./"${CHROOTDIR}"/aria2-${ARIA2_VERSION}/src/aria2c"
+package_output "aria2c" "./${CHROOTDIR}/aria2-${ARIA2_VERSION}/src/aria2c"

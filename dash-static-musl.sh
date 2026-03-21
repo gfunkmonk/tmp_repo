@@ -23,7 +23,7 @@ copy_patches "dash.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 automake \
@@ -53,4 +53,4 @@ make -j\$(nproc) && \
 strip src/dash && \
 ../upx --lzma src/dash"
 
-package_output "dash" "./"${CHROOTDIR}"/dash-${DASH_VERSION}/src/dash"
+package_output "dash" "./${CHROOTDIR}/dash-${DASH_VERSION}/src/dash"

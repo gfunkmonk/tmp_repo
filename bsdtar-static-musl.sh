@@ -28,7 +28,7 @@ setup_qemu
 mount_chroot
 
 # Note: --with-zlib, --without-bz2lib; lzma/zstd/xml2/openssl linked via pkg-config --static
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 make \
@@ -62,8 +62,8 @@ gcc -static -o bsdtar tar/bsdtar-bsdtar.o \
   tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o \
   tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o \
   tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a \
-  -lz -llzma -lzstd -llz4 -lxml2 -lcrypto -lssl && \
+  -lz -lbz2 -llzma -lzstd -llz4 -lxml2 -lcrypto -lssl
 strip bsdtar && \
 ../upx --lzma bsdtar"
 
-package_output "bsdtar" "./"${CHROOTDIR}"/libarchive-${BSDTAR_VERSION}/bsdtar"
+package_output "bsdtar" "./${CHROOTDIR}/libarchive-${BSDTAR_VERSION}/bsdtar"

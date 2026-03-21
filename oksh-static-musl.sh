@@ -24,7 +24,7 @@ setup_alpine_chroot "${OKSH_TARBALL}"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 pkgconfig \
@@ -43,4 +43,4 @@ make -j\$(nproc) && \
 strip oksh && \
 ../upx --ultra-brute oksh"
 
-package_output "oksh" "./"${CHROOTDIR}"/oksh-${OKSH_VERSION}/oksh"
+package_output "oksh" "./${CHROOTDIR}/oksh-${OKSH_VERSION}/oksh"

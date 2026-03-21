@@ -26,7 +26,7 @@ setup_alpine_chroot "${XZ_TARBALL}"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 clang \
@@ -43,4 +43,4 @@ CC=clang LDFLAGS='-static -Wl,--gc-sections' make -j\$(nproc) && \
 strip src/xz/xz && \
 ../upx --lzma src/xz/xz"
 
-package_output "xz" "./"${CHROOTDIR}"/xz-${XZ_VERSION}/src/xz/xz"
+package_output "xz" "./${CHROOTDIR}/xz-${XZ_VERSION}/src/xz/xz"

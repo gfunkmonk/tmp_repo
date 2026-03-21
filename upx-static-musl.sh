@@ -19,14 +19,14 @@ UPX_MIRRORS=(
 
 setup_arch
 setup_cleanup
-#install_host_deps
+install_host_deps
 download_source "upx" "${UPX_VERSION}" "${UPX_TARBALL}" "${UPX_MIRRORS[@]}"
 setup_alpine_chroot "${UPX_TARBALL}"
 copy_patches "upx-mod.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 zlib-dev \
@@ -56,4 +56,4 @@ strip upx && \
 cp upx upx1 && \
 ./upx1 --lzma upx"
 
-package_output "upx" "./"${CHROOTDIR}"/upx-${UPX_VERSION}-src/build/upx"
+package_output "upx" "./${CHROOTDIR}/upx-${UPX_VERSION}-src/build/upx"

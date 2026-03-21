@@ -20,7 +20,7 @@ copy_patches "pigz.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 make \
@@ -37,4 +37,4 @@ make -j\$(nproc) && \
 strip pigz && \
 ../upx --lzma pigz"
 
-package_output "pigz" "./"${CHROOTDIR}"/pigz-${PIGZ_VERSION}/pigz"
+package_output "pigz" "./${CHROOTDIR}/pigz-${PIGZ_VERSION}/pigz"

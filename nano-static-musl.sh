@@ -22,7 +22,7 @@ copy_patches "nano-colors.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 pkgconfig \
@@ -47,4 +47,4 @@ CC='gcc' make -j\$(nproc) && \
 strip src/nano && \
 ../upx --ultra-brute src/nano"
 
-package_output "nano" "./"${CHROOTDIR}"/nano-${NANO_VERSION}/src/nano"
+package_output "nano" "./${CHROOTDIR}/nano-${NANO_VERSION}/src/nano"

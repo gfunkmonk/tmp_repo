@@ -20,7 +20,7 @@ copy_patches "lftp.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 autoconf \
@@ -59,4 +59,4 @@ make -j\$(nproc) LDFLAGS='-static -all-static -Wl,--gc-sections' && \
 strip src/lftp && \
 ../upx --lzma src/lftp"
 
-package_output "lftp" "./"${CHROOTDIR}"/lftp-${LFTP_VERSION}/src/lftp"
+package_output "lftp" "./${CHROOTDIR}/lftp-${LFTP_VERSION}/src/lftp"

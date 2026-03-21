@@ -23,7 +23,7 @@ copy_patches "wget-passive-ftp.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 openssl-dev \
@@ -56,4 +56,4 @@ make -j\$(nproc) && \
 strip src/wget && \
 ../upx --lzma src/wget"
 
-package_output "wget" "./"${CHROOTDIR}"/wget-${WGET_VERSION}/src/wget"
+package_output "wget" "./${CHROOTDIR}/wget-${WGET_VERSION}/src/wget"

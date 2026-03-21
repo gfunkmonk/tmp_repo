@@ -22,7 +22,7 @@ setup_qemu
 mount_chroot
 
 # Note: --with-zlib, --without-bz2lib; lzma/zstd/xml2/openssl linked via pkg-config --static
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 automake \
@@ -54,4 +54,4 @@ make -j\$(nproc) && \
 strip src/tar && \
 ../upx --lzma src/tar"
 
-package_output "tar" "./"${CHROOTDIR}"/tar-${TAR_VERSION}/src/tar"
+package_output "tar" "./${CHROOTDIR}/tar-${TAR_VERSION}/src/tar"

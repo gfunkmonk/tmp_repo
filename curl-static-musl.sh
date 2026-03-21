@@ -29,7 +29,7 @@ setup_alpine_chroot "${CURL_TARBALL}"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 openssl-dev \
@@ -66,4 +66,4 @@ make -j\$(nproc) V=1 LDFLAGS='-static -all-static' && \
 strip src/curl && \
 ../upx --lzma src/curl"
 
-package_output "curl" "./"${CHROOTDIR}"/curl-${CURL_VERSION}/src/curl"
+package_output "curl" "./${CHROOTDIR}/curl-${CURL_VERSION}/src/curl"

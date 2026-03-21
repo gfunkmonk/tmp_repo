@@ -22,6 +22,7 @@ JUNEBUD="\033[38;2;189;218;87m"
 NAVAJO="\033[38;2;255;222;173m"
 BOYSENBERRY="\033[38;2;135;50;96m"
 CORAL="\033[38;2;240;128;128m"
+CAMEL="\033[38;2;193;154;107m"
 NC="\033[0m"
 
 ######### Variables ###########
@@ -32,16 +33,25 @@ ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 JQ="tools/jq/jq-${ARCH}"
 CURL="tools/curl/curl-${ARCH}"
 
+# Override by setting CCACHE_CHROOT_DIR in the environment before running a build script.
+# CI can point this at a host-mounted cache directory to persist ccache across runs.
+CCACHE_CHROOT_DIR="${CCACHE_CHROOT_DIR:-/ccache}"
+
 # setup_arch: resolve QEMU_ARCH, ALPINE_URL, and TARBALL from ARCH
 setup_arch() {
   if [[ ! -x "${JQ}" ]]; then
     echo -e "${TOMATO}= ERROR: jq binary not found: ${JQ}${NC}" >&2
     exit 1
   fi
-  if [[ ! -x "${CURL}" ]]; then
-    echo -e "${TOMATO}= ERROR: curl binary not found: ${CURL}${NC}" >&2
+  if [[ -x "${CURL}" ]]; then
+    : # use bundled curl
+  elif command -v curl >/dev/null 2>&1; then
+    echo -e "${LEMON}= bundled curl not found, falling back to system curl${NC}"
+    CURL="curl"
+  else
+    echo -e "${TOMATO}= ERROR: no curl available (checked ${CURL} and PATH)${NC}" >&2
     exit 1
-  fi
+fi
   case "${ARCH}" in
     x86_64)  QEMU_ARCH="" ;;
     x86)     QEMU_ARCH="i386" ;;
@@ -63,15 +73,14 @@ gh_latest_release() {
     local repo="$1" filter="${2:-.tag_name}"
     "${CURL}" -fsSL --connect-timeout 10 --max-time 30 \
         "https://api.github.com/repos/${repo}/releases/latest" \
-        | "${JQ}" -r "${filter}"
+        | "${JQ}" -r "${filter} // empty"
 }
 
 # setup_cleanup: register unmount trap for chroot bind mounts
 setup_cleanup() {
   cleanup() {
-    sudo umount -lfR "./${CHROOTDIR}/sys"  2>/dev/null || true
-    sudo umount -lfR "./${CHROOTDIR}/proc" 2>/dev/null || true
-    sudo umount -lfR "./${CHROOTDIR}/dev"  2>/dev/null || true
+    echo -e "${CAMEL}Umounting filesystems from chroot -- $CHROOTDIR${NC}"
+    grep ${CHROOTDIR} /proc/mounts | cut -f2 -d" " | sort -r | xargs sudo umount -n || true
 	  }
   trap cleanup EXIT
 }
@@ -91,7 +100,7 @@ download_source() {
   local label="$1" version="$2" tarball="$3"
   shift 3
   if [ ! -d distfiles/ ]; then
-    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.{NC}"
+    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.${NC}"
     mkdir -p distfiles/
   fi
   if [ -f "distfiles/${tarball}" ]; then
@@ -127,7 +136,7 @@ setup_alpine_chroot() {
   fi
   local tarball="$1"
   if [ ! -d distfiles/ ]; then
-    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.{NC}"
+    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.${NC}"
     mkdir -p distfiles/
   fi
   if [ -f distfiles/"${TARBALL}" ]; then
@@ -176,9 +185,11 @@ setup_qemu() {
 # mount_chroot: bind-mount proc/dev/sys into the chroot directory
 mount_chroot() {
   echo -e "${VIOLET}= mount, bind and chroot into dir${NC}"
+  sudo mount --rbind /dev "./${CHROOTDIR}/dev/"
+  sudo mount --make-rslave "./${CHROOTDIR}/dev/"
   sudo mount -t proc none "./${CHROOTDIR}/proc/"
-  sudo mount --rbind --make-rslave /dev "./${CHROOTDIR}/dev/"
-  sudo mount --rbind --make-rslave /sys "./${CHROOTDIR}/sys/"
+  sudo mount --rbind /sys "./${CHROOTDIR}/sys/"
+  sudo mount --make-rslave "./${CHROOTDIR}/sys/"
 }
 
 # package_output TOOL BINARY

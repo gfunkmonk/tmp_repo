@@ -19,7 +19,7 @@ setup_alpine_chroot "${OPENSSH_TARBALL}"
 setup_qemu
 mount_chroot
 
-sudo chroot ./"${CHROOTDIR}"/ /bin/sh -c "set -e && apk update && apk add build-base \
+sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
 ccache \
 openssl-dev \
@@ -39,4 +39,4 @@ make -j\$(nproc) && \
 strip ssh && \
 ../upx --lzma ssh"
 
-package_output "openssh" "./"${CHROOTDIR}"/openssh-${OPENSSH_VERSION}/ssh"
+package_output "openssh" "./${CHROOTDIR}/openssh-${OPENSSH_VERSION}/ssh"

@@ -21,7 +21,7 @@ BASH_MIRRORS=(
 
 download_bash_upstream_patches() {
   echo -e "${AQUA}= download bash ${BASH_VERSION} upstream patches${NC}"
-  mkdir -p "${BASH_PATCH_DIR}"
+  mkdir -p distfiles/"${BASH_PATCH_DIR}"
   local patch_index
   if ! patch_index=$("${CURL}" -fsSL "${BASH_PATCH_URL}"); then
     echo -e "${TOMATO}= ERROR: failed to fetch patch index from ${BASH_PATCH_URL}${NC}"
@@ -38,7 +38,7 @@ download_bash_upstream_patches() {
   fi
   local dest
   for patch in "${BASH_PATCH_FILES[@]}"; do
-    dest="${BASH_PATCH_DIR}/${patch}"
+    dest=distfiles/"${BASH_PATCH_DIR}/${patch}"
     if [ -f "${dest}" ]; then
       echo -e "${SLATE}= ${patch} already downloaded${NC}"
       continue
@@ -50,31 +50,31 @@ download_bash_upstream_patches() {
     fi
   done
   for patch in "${BASH_PATCH_FILES[@]}"; do
-    if [ ! -s "${BASH_PATCH_DIR}/${patch}" ]; then
+    if [ ! -s distfiles/"${BASH_PATCH_DIR}/${patch}" ]; then
       echo -e "${TOMATO}= ERROR: patch file missing after download: ${patch}${NC}"
       exit 1
     fi
   done
-  printf '%s\n' "${BASH_PATCH_FILES[@]}" > "${BASH_PATCH_DIR}/.patch-list"
+  printf '%s\n' "${BASH_PATCH_FILES[@]}" > distfiles/"${BASH_PATCH_DIR}/.patch-list"
 }
 
 setup_arch
 setup_cleanup
-install_host_deps
+#install_host_deps
 download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
 download_bash_upstream_patches
 setup_alpine_chroot "${BASH_TARBALL}"
-cp -r "${BASH_PATCH_DIR}" ./"${CHROOTDIR}"/
+cp -r distfiles/"${BASH_PATCH_DIR}" "./${CHROOTDIR}/"
 copy_patches "bash.patch"
 setup_qemu
 mount_chroot
 
-sudo chroot "${CHROOTDIR}/" /bin/sh -s <<EOF
+sudo chroot "./${CHROOTDIR}/" /bin/sh -s <<EOF
 set -e
 apk update
 apk add build-base musl-dev ccache sed automake autoconf pkgconfig ncurses-dev ncurses-static perl gettext-dev gettext-static readline readline-static
 mkdir -p /ccache
-export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH
+export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:$PATH
 chmod 755 upx
 tar xf ${BASH_TARBALL}
 cd bash-${BASH_VERSION}/
