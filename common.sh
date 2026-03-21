@@ -97,7 +97,7 @@ gh_latest_tag() {
 setup_cleanup() {
   cleanup() {
     echo -e "${CAMEL}Umounting filesystems from chroot -- $CHROOTDIR${NC}"
-    grep "$(pwd)/${CHROOTDIR}" /proc/mounts | cut -f2 -d" " | sort -r | xargs sudo umount -n || true
+    grep "$(pwd)/${CHROOTDIR}" /proc/mounts | cut -f2 -d" " | sort -r | xargs -r sudo umount -n || true
 	  }
   trap cleanup EXIT
 }
@@ -153,7 +153,7 @@ setup_alpine_chroot() {
   fi
   local tarball="$1"
   if [ ! -d chrootfiles/ ]; then
-    echo -e "${HOTPINK}distfiles dir does not exist. Creating it now.${NC}"
+    echo -e "${HOTPINK}chrootfiles dir does not exist. Creating it now.${NC}"
     mkdir -p chrootfiles/
   fi
   if [ -f chrootfiles/"${TARBALL}" ]; then
@@ -207,6 +207,10 @@ mount_chroot() {
   sudo mount -t proc none "./${CHROOTDIR}/proc/"
   sudo mount --rbind /sys "./${CHROOTDIR}/sys/"
   sudo mount --make-rslave "./${CHROOTDIR}/sys/"
+  if [ -n "${CCACHE_DIR:-}" ] && [ -d "${CCACHE_DIR}" ]; then
+    sudo mkdir -p "./${CHROOTDIR}/${CCACHE_CHROOT_DIR}"
+    sudo mount --bind "${CCACHE_DIR}" "./${CHROOTDIR}/${CCACHE_CHROOT_DIR}"
+  fi
 }
 
 # package_output TOOL BINARY

@@ -49,7 +49,7 @@ jobs:
         id: set-matrix
         run: |
           if [[ "${{ github.event_name }}" == "schedule" || "${{ inputs.tool }}" == "all" || "${{ inputs.tool }}" == "" ]]; then
-            echo 'matrix=["7zz","aria2c","axel","bsdtar","curl","dash","htop","lftp","nano","oksh","openssh","pigz","tar","upx","vim","wget","xz"]' >> "$GITHUB_OUTPUT"
+            echo 'matrix=["7zz","aria2c","axel","bash","bsdtar","curl","dash","htop","lftp","nano","oksh","openssh","pigz","tar","upx","vim","wget","xz"]' >> "$GITHUB_OUTPUT"
           else
             echo 'matrix=["${{ inputs.tool }}"]' >> "$GITHUB_OUTPUT"
           fi
@@ -58,7 +58,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     env:
-      CCACHE_DIR: ${{ github.workspace }}/pasta/ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
       CCACHE_CHROOT_DIR: /ccache
     strategy:
       fail-fast: false
@@ -68,27 +68,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-
-    - name: Determine tool version
-      id: tool-version
-      run: |
-        set -euo pipefail
-        if [ "${{ matrix.tool }}" = "aria2c" ]; then
-          version=$(curl -fsSL --connect-timeout 10 --max-time 30 \
-            "https://api.github.com/repos/aria2/aria2/releases/latest" \
-            | grep '"tag_name"' | sed 's/.*"release-\([^"]*\)".*/\1/') || true
-          if [ -z "${version}" ]; then
-            version="1.37.0"
-          fi
-        else
-          version=$(sed -n 's/^[A-Z_]*VERSION="\([^"]*\)".*/\1/p' "${{ matrix.tool }}-static-musl.sh" | head -n1)
-        fi
-        if [ -z "${version}" ]; then
-          echo "Unable to determine version for ${{ matrix.tool }}" >&2
-          exit 1
-        fi
-        echo "version=${version}" >> "$GITHUB_OUTPUT"
-        echo "PACKAGE_VERSION=${version}" >> "$GITHUB_ENV"
 
     - name: read Alpine version
       run: |
@@ -125,17 +104,13 @@ jobs:
     - name: Cache tarballs
       uses: actions/cache@v5
       with:
-        path: |
-          distfiles/*.tar.gz
-          distfiles/*.tar.xz
-        key: build-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-${{ hashFiles(format('{0}-static-musl.sh', matrix.tool)) }}
-        restore-keys: |
-          build-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-
+        path: distfiles/
+        key: distfiles-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-${{ hashFiles(format('{0}-static-musl.sh', matrix.tool)) }}
 
     - name: cache Alpine rootfs
       uses: actions/cache@v5
       with:
-        path: chrootfiles/alpine-minirootfs-*.tar.gz
+        path: chrootfiles/
         key: alpine-rootfs-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}
 
     - name: Build ${{ matrix.tool }} for ${{ matrix.arch }}

@@ -23,7 +23,7 @@ BASH_MIRRORS=(
 
 download_bash_upstream_patches() {
   echo -e "${AQUA}= download bash ${BASH_VERSION} upstream patches${NC}"
-  mkdir -p "${BASH_PATCH_DIR}"
+  mkdir -p distfiles/"${BASH_PATCH_DIR}"
   local patch_index
   if ! patch_index=$("${CURL}" -fsSL "${BASH_PATCH_URL}"); then
     echo -e "${TOMATO}= ERROR: failed to fetch patch index from ${BASH_PATCH_URL}${NC}"
@@ -66,7 +66,7 @@ install_host_deps
 download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
 download_bash_upstream_patches
 setup_alpine_chroot "${BASH_TARBALL}"
-cp -r "${BASH_PATCH_DIR}" "./${CHROOTDIR}/"
+cp -r distfiles/"${BASH_PATCH_DIR}" "./${CHROOTDIR}/"
 copy_patches "bash.patch"
 setup_qemu
 mount_chroot
