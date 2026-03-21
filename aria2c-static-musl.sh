@@ -60,7 +60,7 @@ patch -p1 --fuzz=4 < ../aria2.patch && \
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
   --without-gnutls --with-openssl --with-libcares \
   --disable-bittorrent --with-sqlite3 \
-  --enable-shared=no --enable-static --disable-shared \
+  --enable-static --disable-shared \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
   CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -no-pie -Wno-unterminated-string-initialization' && \
 make -j\$(nproc) && \
