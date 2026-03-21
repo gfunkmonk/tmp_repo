@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 AXEL_VERSION=$(gh_latest_release "axel-download-accelerator/axel" '.tag_name | ltrimstr("v")') || true
 if [ -z "${AXEL_VERSION}" ]; then
   echo -e "${TAWNY}= GitHub API unavailable, falling back to axel 2.17.14${NC}"
@@ -40,7 +42,7 @@ zlib-static \
 libpsl-static \
 libunistring-dev \
 libunistring-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf axel-${AXEL_VERSION}.tar.xz && \
 cd axel-${AXEL_VERSION}/ && \

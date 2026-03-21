@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest oksh version${NC}"
 OKSH_VERSION=$(gh_latest_release "ibara/oksh" '.tag_name | ltrimstr("oksh-")') || true
 if [ -z "${OKSH_VERSION}" ]; then
@@ -32,7 +34,7 @@ ncurses-dev \
 ncurses-static \
 autoconf \
 patch && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf oksh-${OKSH_VERSION}.tar.gz && \
 cd oksh-${OKSH_VERSION}/ && \

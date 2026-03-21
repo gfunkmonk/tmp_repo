@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${AQUA}= fetching latest aria2 version${NC}"
 ARIA2_VERSION=$(gh_latest_release "aria2/aria2" '.tag_name | ltrimstr("release-")') || true
 if [ -z "${ARIA2_VERSION}" ]; then
@@ -51,7 +53,7 @@ xz-dev \
 xz-static \
 patch \
 pkgconfig && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf aria2-${ARIA2_VERSION}.tar.gz && \
 cd aria2-${ARIA2_VERSION}/ && \

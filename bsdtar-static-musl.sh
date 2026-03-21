@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest bsdtar version${NC}"
 BSDTAR_VERSION=$(gh_latest_release "libarchive/libarchive" '.tag_name | ltrimstr("v")') || true
 if [ -z "${BSDTAR_VERSION}" ]; then
@@ -47,7 +49,7 @@ libbz2 \
 bzip2-static \
 libxml2-dev \
 libxml2-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf libarchive-${BSDTAR_VERSION}.tar.xz && \
 cd libarchive-${BSDTAR_VERSION}/ && \
@@ -62,7 +64,7 @@ gcc -static -o bsdtar tar/bsdtar-bsdtar.o \
   tar/bsdtar-cmdline.o tar/bsdtar-creation_set.o \
   tar/bsdtar-read.o tar/bsdtar-subst.o tar/bsdtar-util.o \
   tar/bsdtar-write.o .libs/libarchive.a .libs/libarchive_fe.a \
-  -lz -lbz2 -llzma -lzstd -llz4 -lxml2 -lcrypto -lssl
+  -lz -lbz2 -llzma -lzstd -llz4 -lxml2 -lcrypto -lssl && \
 strip bsdtar && \
 ../upx --lzma bsdtar"
 

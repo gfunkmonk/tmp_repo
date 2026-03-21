@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest xz version${NC}"
 XZ_VERSION=$(gh_latest_release "tukaani-project/xz" '.tag_name | ltrimstr("v")') || true
 if [ -z "${XZ_VERSION}" ]; then
@@ -31,7 +33,7 @@ musl-dev \
 ccache \
 clang \
 pkgconfig && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf xz-${XZ_VERSION}.tar.xz && \
 cd xz-${XZ_VERSION}/ && \

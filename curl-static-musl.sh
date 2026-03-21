@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest curl version${NC}"
 CURL_VERSION=$(gh_latest_release "curl/curl" '.tag_name | ltrimstr("curl-") | gsub("_"; ".")') || true
 if [ -z "${CURL_VERSION}" ]; then
@@ -51,7 +53,7 @@ libidn2-dev \
 libpsl-static \
 libpsl-dev \
 clang && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf curl-${CURL_VERSION}.tar.xz && \
 cd curl-${CURL_VERSION}/ && \

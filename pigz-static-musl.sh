@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 PIGZ_VERSION="2.8"
 PACKAGE_VERSION="${PIGZ_VERSION}"
 PIGZ_TARBALL="pigz-${PIGZ_VERSION}.tar.gz"
@@ -28,7 +30,7 @@ sed \
 gcc \
 zlib-dev \
 zlib-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf pigz-${PIGZ_VERSION}.tar.gz && \
 cd pigz-${PIGZ_VERSION}/ && \

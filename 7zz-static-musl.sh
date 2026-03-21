@@ -1,7 +1,9 @@
 #!/bin/bash
 set -euo pipefail
-set -x
+
 . "$(dirname "$0")/common.sh"
+
+setup_tools
 
 echo -e "${VIOLET}= fetching latest 7zip version${NC}"
 SEVENZIP_VERSION=$(gh_latest_release "mcmilk/7-Zip-zstd") || true
@@ -53,7 +55,7 @@ set -e
 apk update && apk add build-base musl-dev ccache gcc g++ patch git nasm make
 apk add uasm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing
 mkdir -p /ccache
-export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:$PATH
+export CCACHE_DIR=${CCACHE_CHROOT_DIR}
 cp upx /usr/local/bin
 tar xf ${SEVENZIP_TARBALL}
 cd 7-Zip-zstd-${SEVENZIP_SHORT}/
@@ -69,9 +71,9 @@ make -j\$(nproc) \
   CFLAGS_WARN_WALL='-Wall -Wextra' ${MAKE_OPTS} PLATFORM=${PLATFORM} COMPL_STATIC=1 \
   CC='gcc -Os -static -ffunction-sections -fdata-sections' \
   CXX='g++ -Os -static -ffunction-sections -fdata-sections'
-binary=$(find . \( -name '7zzs' -o -name '7zz' \) -type f | head -n1)
-[ -n "$binary" ] || { echo "Error: 7zzs or 7zz binary not found after build" >&2; exit 1; }
-cp -va "$binary" 7zz
+binary=\$(find . \( -name '7zzs' -o -name '7zz' \) -type f | head -n1)
+[ -n "\$binary" ] || { echo "Error: 7zzs or 7zz binary not found after build" >&2; exit 1; }
+cp -va "\$binary" 7zz
 strip 7zz
 cp 7zz /7-Zip-zstd-${SEVENZIP_SHORT}/7zz
 /usr/local/bin/upx --lzma /7-Zip-zstd-${SEVENZIP_SHORT}/7zz

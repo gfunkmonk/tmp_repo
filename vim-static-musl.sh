@@ -2,9 +2,10 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest vim version${NC}"
-VIM_VERSION=$("${CURL}" -fsSL "https://api.github.com/repos/vim/vim/tags" \
-  | "${JQ}" -r '.[0].name | ltrimstr("v")') || true
+VIM_VERSION=$(gh_latest_tag "vim/vim" '.[0].name | ltrimstr("v")') || true
 if [ -z "${VIM_VERSION}" ]; then
   echo -e "${TAWNY}= GitHub API unavailable, falling back to vim 9.2.0119${NC}"
   VIM_VERSION="9.2.0119"
@@ -34,7 +35,7 @@ patch \
 pkgconfig \
 ncurses-dev \
 ncurses-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \

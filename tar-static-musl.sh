@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 TAR_VERSION="1.35"
 PACKAGE_VERSION="${TAR_VERSION}"
 TAR_TARBALL="tar-${TAR_VERSION}.tar.xz"
@@ -40,7 +42,7 @@ libbz2 \
 bzip2-static \
 gettext-dev \
 gettext-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf tar-${TAR_VERSION}.tar.xz && \
 cd tar-${TAR_VERSION}/ && \

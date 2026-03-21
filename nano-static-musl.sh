@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 NANO_VERSION="8.7.1"
 PACKAGE_VERSION="${NANO_VERSION}"
 NANO_TARBALL="nano-${NANO_VERSION}.tar.xz"
@@ -32,7 +34,7 @@ libmagic-static \
 libmagic \
 file-dev \
 linux-headers && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf ${NANO_TARBALL} && \
 cd nano-${NANO_VERSION}/ && \

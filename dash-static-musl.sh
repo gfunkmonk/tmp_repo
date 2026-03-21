@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 DASH_VERSION="0.5.13.1"
 PACKAGE_VERSION="${DASH_VERSION}"
 DASH_TARBALL="dash-${DASH_VERSION}.tar.gz"
@@ -39,7 +41,7 @@ autoconf \
 patch \
 libedit-dev \
 libedit-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf dash-${DASH_VERSION}.tar.gz && \
 cd dash-${DASH_VERSION}/ && \

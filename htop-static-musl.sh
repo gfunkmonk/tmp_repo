@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest htop version${NC}"
 HTOP_VERSION=$(gh_latest_release "htop-dev/htop") || true
 if [ -z "${HTOP_VERSION}" ]; then
@@ -36,7 +38,7 @@ lm-sensors-dev \
 libnl3-dev \
 libnl3-static \
 linux-headers && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf ${HTOP_TARBALL} && \
 cd htop-${HTOP_VERSION}/ && \

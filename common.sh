@@ -37,10 +37,14 @@ CURL="tools/curl/curl-${ARCH}"
 # CI can point this at a host-mounted cache directory to persist ccache across runs.
 CCACHE_CHROOT_DIR="${CCACHE_CHROOT_DIR:-/ccache}"
 
-# setup_arch: resolve QEMU_ARCH, ALPINE_URL, and TARBALL from ARCH
-setup_arch() {
-  if [[ ! -x "${JQ}" ]]; then
-    echo -e "${TOMATO}= ERROR: jq binary not found: ${JQ}${NC}" >&2
+setup_tools() {
+  if [[ -x "${JQ}" ]]; then
+    : # use bundled jq
+  elif command -v jq >/dev/null 2>&1; then
+    echo -e "${LEMON}= bundled jq binary not found, falling back to system jq${NC}" >&2
+    JQ="jq"
+  else
+    echo -e "${TOMATO}= ERROR: no jq binary available (checked ${JQ} and PATH)${NC}" >&2
     exit 1
   fi
   if [[ -x "${CURL}" ]]; then
@@ -51,7 +55,11 @@ setup_arch() {
   else
     echo -e "${TOMATO}= ERROR: no curl available (checked ${CURL} and PATH)${NC}" >&2
     exit 1
-fi
+  fi
+}
+
+# setup_arch: resolve QEMU_ARCH, ALPINE_URL, and TARBALL from ARCH
+setup_arch() {
   case "${ARCH}" in
     x86_64)  QEMU_ARCH="" ;;
     x86)     QEMU_ARCH="i386" ;;
@@ -76,11 +84,20 @@ gh_latest_release() {
         | "${JQ}" -r "${filter} // empty"
 }
 
+# gh_latest_tag REPO [JQ_FILTER]
+# Fetches the first entry from the GitHub tags API, applies optional jq filter.
+gh_latest_tag() {
+    local repo="$1" filter="${2:-.[0].name}"
+    "${CURL}" -fsSL --connect-timeout 10 --max-time 30 \
+        "https://api.github.com/repos/${repo}/tags" \
+        | "${JQ}" -r "${filter} // empty"
+}
+
 # setup_cleanup: register unmount trap for chroot bind mounts
 setup_cleanup() {
   cleanup() {
     echo -e "${CAMEL}Umounting filesystems from chroot -- $CHROOTDIR${NC}"
-    grep ${CHROOTDIR} /proc/mounts | cut -f2 -d" " | sort -r | xargs sudo umount -n || true
+    grep "$(pwd)/${CHROOTDIR}" /proc/mounts | cut -f2 -d" " | sort -r | xargs sudo umount -n || true
 	  }
   trap cleanup EXIT
 }

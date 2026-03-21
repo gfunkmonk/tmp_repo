@@ -3,6 +3,8 @@ set -euo pipefail
 
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 echo -e "${VIOLET}= fetching latest upx version${NC}"
 UPX_VERSION=$(gh_latest_release "upx/upx" '.tag_name | ltrimstr("v")'	) || true
 if [ -z "${UPX_VERSION}" ]; then
@@ -35,7 +37,7 @@ zstd-dev \
 zstd-static \
 cmake \
 samurai && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf upx-${UPX_VERSION}-src.tar.xz && \
 cd upx-${UPX_VERSION}-src/ && \

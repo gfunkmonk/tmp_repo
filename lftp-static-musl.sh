@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 LFTP_VERSION="4.9.3"
 PACKAGE_VERSION="${LFTP_VERSION}"
 LFTP_TARBALL="lftp-${LFTP_VERSION}.tar.xz"
@@ -44,7 +46,7 @@ zlib-static \
 libstdc++-dev \
 gettext-dev \
 gettext-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
 chmod 755 upx && \
 tar xf lftp-${LFTP_VERSION}.tar.xz && \
 cd lftp-${LFTP_VERSION}/ && \

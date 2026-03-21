@@ -2,6 +2,8 @@
 set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
+setup_tools
+
 BASH_VERSION="5.3"
 PACKAGE_VERSION="${BASH_VERSION}"
 BASH_TARBALL="bash-${BASH_VERSION}.tar.gz"
@@ -21,7 +23,7 @@ BASH_MIRRORS=(
 
 download_bash_upstream_patches() {
   echo -e "${AQUA}= download bash ${BASH_VERSION} upstream patches${NC}"
-  mkdir -p distfiles/"${BASH_PATCH_DIR}"
+  mkdir -p "${BASH_PATCH_DIR}"
   local patch_index
   if ! patch_index=$("${CURL}" -fsSL "${BASH_PATCH_URL}"); then
     echo -e "${TOMATO}= ERROR: failed to fetch patch index from ${BASH_PATCH_URL}${NC}"
@@ -60,11 +62,11 @@ download_bash_upstream_patches() {
 
 setup_arch
 setup_cleanup
-#install_host_deps
+install_host_deps
 download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
 download_bash_upstream_patches
 setup_alpine_chroot "${BASH_TARBALL}"
-cp -r distfiles/"${BASH_PATCH_DIR}" "./${CHROOTDIR}/"
+cp -r "${BASH_PATCH_DIR}" "./${CHROOTDIR}/"
 copy_patches "bash.patch"
 setup_qemu
 mount_chroot
@@ -74,7 +76,7 @@ set -e
 apk update
 apk add build-base musl-dev ccache sed automake autoconf pkgconfig ncurses-dev ncurses-static perl gettext-dev gettext-static readline readline-static
 mkdir -p /ccache
-export CCACHE_DIR=${CCACHE_CHROOT_DIR:-/ccache} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:$PATH
+export CCACHE_DIR=${CCACHE_CHROOT_DIR}
 chmod 755 upx
 tar xf ${BASH_TARBALL}
 cd bash-${BASH_VERSION}/
