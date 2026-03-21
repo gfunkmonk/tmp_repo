@@ -30,7 +30,7 @@ zlib-dev \
 zlib-static \
 autoconf \
 automake && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf openssh-${OPENSSH_VERSION}.tar.gz && \
 cd openssh-${OPENSSH_VERSION}/ && \

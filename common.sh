@@ -80,6 +80,7 @@ setup_arch() {
 gh_latest_release() {
     local repo="$1" filter="${2:-.tag_name}"
     "${CURL}" -fsSL --connect-timeout 10 --max-time 30 \
+        ${GITHUB_TOKEN:+-H "Authorization: Bearer ${GITHUB_TOKEN}"} \
         "https://api.github.com/repos/${repo}/releases/latest" \
         | "${JQ}" -r "${filter} // empty"
 }

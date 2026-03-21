@@ -53,7 +53,7 @@ xz-dev \
 xz-static \
 patch \
 pkgconfig && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf aria2-${ARIA2_VERSION}.tar.gz && \
 cd aria2-${ARIA2_VERSION}/ && \

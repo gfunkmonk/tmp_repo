@@ -20,7 +20,7 @@ Build scripts that produce fully static, multi-architecture binaries using musl 
 | openssh | 10.2p1 | OpenSSH ssh client |
 | pigz | 2.8 | Parallel implementation of GZip |
 | tar | 1.35 | GNU tar archive utility |
-| upx | custom | UPX w/ zstd support |
+| upx | latest | UPX w/ custom patch & zstd support |
 | vim | latest | Text editor |
 | wget | 1.25.0 | File downloader |
 | xz | latest | XZ/LZMA compression |

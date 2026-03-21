@@ -55,7 +55,7 @@ set -e
 apk update && apk add build-base musl-dev ccache gcc g++ patch git nasm make
 apk add uasm --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing
 mkdir -p /ccache
-export CCACHE_DIR=${CCACHE_CHROOT_DIR}
+export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH
 cp upx /usr/local/bin
 tar xf ${SEVENZIP_TARBALL}
 cd 7-Zip-zstd-${SEVENZIP_SHORT}/

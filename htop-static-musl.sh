@@ -38,7 +38,7 @@ lm-sensors-dev \
 libnl3-dev \
 libnl3-static \
 linux-headers && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf ${HTOP_TARBALL} && \
 cd htop-${HTOP_VERSION}/ && \

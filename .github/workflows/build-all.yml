@@ -76,7 +76,7 @@ jobs:
     - name: Prepare ccache directory
       run: |
             mkdir -p "${CCACHE_DIR}"
-            cat >> $GITHUB_ENV << 'EOF'
+            cat >> "$GITHUB_ENV" << 'EOF'
             CCACHE_NOHASHDIR=true
             CCACHE_NOHARDLINK=true
             CCACHE_NLEVELS=4
@@ -92,7 +92,7 @@ jobs:
             echo "CCACHE Environment set!"
 
     - name: Set up ccache
-      uses: hendrikmuhs/ccache-action@main
+      uses: hendrikmuhs/ccache-action@v1.2
       with:
         create-symlink: true
         key: ccache-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-${{ hashFiles(format('{0}-static-musl.sh', matrix.tool)) }}
@@ -106,6 +106,8 @@ jobs:
       with:
         path: distfiles/
         key: distfiles-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-${{ hashFiles(format('{0}-static-musl.sh', matrix.tool)) }}
+        restore-keys: |
+          distfiles-${{ env.ALPINE_VERSION }}-${{ matrix.arch }}-${{ matrix.tool }}-
 
     - name: cache Alpine rootfs
       uses: actions/cache@v5
@@ -119,6 +121,7 @@ jobs:
         ./${{ matrix.tool }}-static-musl.sh
       env:
         ARCH: ${{ matrix.arch }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Gather artifact info
       id: artifact-info

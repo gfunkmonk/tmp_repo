@@ -37,7 +37,7 @@ zstd-dev \
 zstd-static \
 cmake \
 samurai && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf upx-${UPX_VERSION}-src.tar.xz && \
 cd upx-${UPX_VERSION}-src/ && \

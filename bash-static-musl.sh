@@ -76,7 +76,7 @@ set -e
 apk update
 apk add build-base musl-dev ccache sed automake autoconf pkgconfig ncurses-dev ncurses-static perl gettext-dev gettext-static readline readline-static
 mkdir -p /ccache
-export CCACHE_DIR=${CCACHE_CHROOT_DIR}
+export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH
 chmod 755 upx
 tar xf ${BASH_TARBALL}
 cd bash-${BASH_VERSION}/

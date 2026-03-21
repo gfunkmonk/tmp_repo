@@ -35,7 +35,7 @@ patch \
 pkgconfig \
 ncurses-dev \
 ncurses-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf ${VIM_TARBALL} && \
 cd vim-${VIM_VERSION}/ && \

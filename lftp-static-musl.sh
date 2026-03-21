@@ -46,7 +46,7 @@ zlib-static \
 libstdc++-dev \
 gettext-dev \
 gettext-static && \
-mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} && \
+mkdir -p /ccache && export CCACHE_DIR=${CCACHE_CHROOT_DIR} CCACHE_BASEDIR=/ PATH=/usr/lib/ccache/bin:\$PATH && \
 chmod 755 upx && \
 tar xf lftp-${LFTP_VERSION}.tar.xz && \
 cd lftp-${LFTP_VERSION}/ && \
