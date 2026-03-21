@@ -23,13 +23,8 @@ CURL_MIRRORS=(
   "https://mirror.ircam.fr/pub/OpenBSD/distfiles/curl-${CURL_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "curl" "${CURL_VERSION}" "${CURL_TARBALL}" "${CURL_MIRRORS[@]}"
-setup_alpine_chroot "${CURL_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "curl" "${CURL_VERSION}" "${CURL_TARBALL}" \
+  -- "${CURL_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

@@ -18,14 +18,9 @@ HTOP_MIRRORS=(
   "https://fossies.org/linux/misc/htop-${HTOP_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "htop" "${HTOP_VERSION}" "${HTOP_TARBALL}" "${HTOP_MIRRORS[@]}"
-setup_alpine_chroot "${HTOP_TARBALL}"
-copy_patches "htop.patch"
-setup_qemu
-mount_chroot
+run_build_setup "htop" "${HTOP_VERSION}" "${HTOP_TARBALL}" \
+  "htop.patch" \
+  -- "${HTOP_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

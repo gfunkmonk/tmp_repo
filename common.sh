@@ -3,7 +3,7 @@
 # Source this file at the top of each build script: . "$(dirname "$0")/common.sh"
 
 ######### Variables ###########
-CHROOTDIR=${CHROOTDIR:pasta}
+CHROOTDIR=${CHROOTDIR:-.chrootbuild}
 ARCH=${ARCH:-x86_64}
 ALPINE_VERSION="3.23.3"
 ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
@@ -219,6 +219,30 @@ mount_chroot() {
       sudo mkdir -p "./${CHROOTDIR}/var/log/ccache/"
     fi
   fi
+}
+
+# run_build_setup TOOL VERSION TARBALL [PATCH...] -- MIRROR [MIRROR...]
+# Runs the full pre-chroot setup sequence. Patches and mirrors are separated by --.
+# Usage: run_build_setup "curl" "8.19.0" "curl-8.19.0.tar.xz" -- "https://..." [...]
+# Usage (with patches): run_build_setup "wget" "1.25.0" "wget.tar.gz" "wget.patch" -- "https://..." [...]
+run_build_setup() {
+  local tool="$1" version="$2" tarball="$3"
+  shift 3
+  local patches=()
+  while [[ $# -gt 0 && "$1" != "--" ]]; do
+    patches+=("$1")
+    shift
+  done
+  [[ $# -gt 0 && "$1" == "--" ]] && shift
+  local mirrors=("$@")
+  setup_arch
+  setup_cleanup
+  install_host_deps
+  download_source "${tool}" "${version}" "${tarball}" "${mirrors[@]}"
+  setup_alpine_chroot "${tarball}"
+  [[ ${#patches[@]} -gt 0 ]] && copy_patches "${patches[@]}"
+  setup_qemu
+  mount_chroot
 }
 
 # package_output TOOL BINARY

@@ -18,13 +18,8 @@ OKSH_MIRRORS=(
   "https://distfiles.alpinelinux.org/distfiles/v3.23/oksh-${OKSH_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "oksh" "${OKSH_VERSION}" "${OKSH_TARBALL}" "${OKSH_MIRRORS[@]}"
-setup_alpine_chroot "${OKSH_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "oksh" "${OKSH_VERSION}" "${OKSH_TARBALL}" \
+  -- "${OKSH_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

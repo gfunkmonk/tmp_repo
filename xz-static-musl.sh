@@ -20,13 +20,8 @@ XZ_MIRRORS=(
   "https://m3-container.net/M3_Container/oss_packages/xz-${XZ_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "xz" "${XZ_VERSION}" "${XZ_TARBALL}" "${XZ_MIRRORS[@]}"
-setup_alpine_chroot "${XZ_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "xz" "${XZ_VERSION}" "${XZ_TARBALL}" \
+  -- "${XZ_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

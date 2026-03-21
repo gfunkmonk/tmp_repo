@@ -13,14 +13,9 @@ PIGZ_MIRRORS=(
   "https://gentoo.osuosl.org/distfiles/70/pigz-${PIGZ_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "pigz" "${PIGZ_VERSION}" "${PIGZ_TARBALL}" "${PIGZ_MIRRORS[@]}"
-setup_alpine_chroot "${PIGZ_TARBALL}"
-copy_patches "pigz.patch"
-setup_qemu
-mount_chroot
+run_build_setup "pigz" "${PIGZ_VERSION}" "${PIGZ_TARBALL}" \
+  "pigz.patch" \
+  -- "${PIGZ_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

@@ -15,14 +15,9 @@ NANO_MIRRORS=(
   "https://pilotfiber.dl.sourceforge.net/project/immortalwrt/sources/nano-${NANO_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "nano" "${NANO_VERSION}" "${NANO_TARBALL}" "${NANO_MIRRORS[@]}"
-setup_alpine_chroot "${NANO_TARBALL}"
-copy_patches "nano-colors.patch"
-setup_qemu
-mount_chroot
+run_build_setup "nano" "${NANO_VERSION}" "${NANO_TARBALL}" \
+  "nano-colors.patch" \
+  -- "${NANO_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

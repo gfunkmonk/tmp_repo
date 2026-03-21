@@ -12,13 +12,8 @@ LESS_MIRRORS=(
   "https://fossies.org/linux/misc/less-${LESS_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "less" "${LESS_VERSION}" "${LESS_TARBALL}" "${LESS_MIRRORS[@]}"
-setup_alpine_chroot "${LESS_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "less" "${LESS_VERSION}" "${LESS_TARBALL}" \
+  -- "${LESS_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

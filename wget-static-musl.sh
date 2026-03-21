@@ -16,14 +16,9 @@ WGET_MIRRORS=(
   "https://mirror.csclub.uwaterloo.ca/gnu/wget/wget-${WGET_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "wget" "${WGET_VERSION}" "${WGET_TARBALL}" "${WGET_MIRRORS[@]}"
-setup_alpine_chroot "${WGET_TARBALL}"
-copy_patches "wget-passive-ftp.patch"
-setup_qemu
-mount_chroot
+run_build_setup "wget" "${WGET_VERSION}" "${WGET_TARBALL}" \
+  "wget-passive-ftp.patch" \
+  -- "${WGET_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

@@ -13,14 +13,9 @@ LFTP_MIRRORS=(
   "https://fossies.org/linux/misc/lftp-${LFTP_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "lftp" "${LFTP_VERSION}" "${LFTP_TARBALL}" "${LFTP_MIRRORS[@]}"
-setup_alpine_chroot "${LFTP_TARBALL}"
-copy_patches "lftp.patch"
-setup_qemu
-mount_chroot
+run_build_setup "lftp" "${LFTP_VERSION}" "${LFTP_TARBALL}" \
+  "lftp.patch" \
+  -- "${LFTP_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
