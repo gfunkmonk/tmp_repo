@@ -249,7 +249,7 @@ run_build_setup() {
 package_output() {
   local tool="$1" binary="$2"
   local version_suffix=""
-  [ -n "${PACKAGE_VERSION:-}" ] && version_suffix="-${PACKAGE_VERSION}"  
+  [ -n "${PACKAGE_VERSION:-}" ] && version_suffix="-${PACKAGE_VERSION}"
   local filename="${tool}${version_suffix}-${ARCH}"
   mkdir -p dist
   cp "${binary}" "dist/${filename}"
