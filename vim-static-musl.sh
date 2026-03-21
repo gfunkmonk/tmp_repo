@@ -18,14 +18,9 @@ VIM_MIRRORS=(
   "https://fossies.org/linux/misc/vim-${VIM_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "vim" "${VIM_VERSION}" "${VIM_TARBALL}" "${VIM_MIRRORS[@]}"
-setup_alpine_chroot "${VIM_TARBALL}"
-copy_patches "vim.patch"
-setup_qemu
-mount_chroot
+run_build_setup "vim" "${VIM_VERSION}" "${VIM_TARBALL}" \
+  "vim.patch" \
+  -- "${VIM_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

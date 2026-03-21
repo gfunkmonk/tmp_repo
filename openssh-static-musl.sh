@@ -13,13 +13,8 @@ OPENSSH_MIRRORS=(
   "https://mirrors.mit.edu/macports/distfiles/openssh/openssh-${OPENSSH_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "openssh" "${OPENSSH_VERSION}" "${OPENSSH_TARBALL}" "${OPENSSH_MIRRORS[@]}"
-setup_alpine_chroot "${OPENSSH_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "openssh" "${OPENSSH_VERSION}" "${OPENSSH_TARBALL}" \
+  -- "${OPENSSH_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

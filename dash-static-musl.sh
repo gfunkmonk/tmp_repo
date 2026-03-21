@@ -16,14 +16,9 @@ DASH_MIRRORS=(
   "https://mirrors.lug.mtu.edu/gentoo/distfiles/46/dash-${DASH_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "dash" "${DASH_VERSION}" "${DASH_TARBALL}" "${DASH_MIRRORS[@]}"
-setup_alpine_chroot "${DASH_TARBALL}"
-copy_patches "dash.patch"
-setup_qemu
-mount_chroot
+run_build_setup "dash" "${DASH_VERSION}" "${DASH_TARBALL}" \
+  "dash.patch" \
+  -- "${DASH_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

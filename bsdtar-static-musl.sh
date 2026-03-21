@@ -21,13 +21,8 @@ BSDTAR_MIRRORS=(
   "https://ftp.fau.de/macports/distfiles/libarchive/libarchive-${BSDTAR_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "libarchive" "${BSDTAR_VERSION}" "${BSDTAR_TARBALL}" "${BSDTAR_MIRRORS[@]}"
-setup_alpine_chroot "${BSDTAR_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "libarchive" "${BSDTAR_VERSION}" "${BSDTAR_TARBALL}" \
+  -- "${BSDTAR_MIRRORS[@]}"
 
 # Note: --with-zlib, --without-bz2lib; lzma/zstd/xml2/openssl linked via pkg-config --static
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \

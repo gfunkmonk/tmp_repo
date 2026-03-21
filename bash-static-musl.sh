@@ -60,16 +60,11 @@ download_bash_upstream_patches() {
   printf '%s\n' "${BASH_PATCH_FILES[@]}" > distfiles/"${BASH_PATCH_DIR}/.patch-list"
 }
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "bash" "${BASH_VERSION}" "${BASH_TARBALL}" "${BASH_MIRRORS[@]}"
 download_bash_upstream_patches
-setup_alpine_chroot "${BASH_TARBALL}"
+run_build_setup "bash" "${BASH_VERSION}" "${BASH_TARBALL}" \
+  "bash.patch" \
+  -- "${BASH_MIRRORS[@]}"
 cp -r distfiles/"${BASH_PATCH_DIR}" "./${CHROOTDIR}/"
-copy_patches "bash.patch"
-setup_qemu
-mount_chroot
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -s <<EOF
 set -e

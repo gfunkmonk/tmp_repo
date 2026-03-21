@@ -14,14 +14,9 @@ TAR_MIRRORS=(
   "https://mirrors.omnios.org/tar/tar-${TAR_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "tar" "${TAR_VERSION}" "${TAR_TARBALL}" "${TAR_MIRRORS[@]}"
-setup_alpine_chroot "${TAR_TARBALL}"
-copy_patches "tar.patch"
-setup_qemu
-mount_chroot
+run_build_setup "tar" "${TAR_VERSION}" "${TAR_TARBALL}" \
+  "tar.patch" \
+  -- "${TAR_MIRRORS[@]}"
 
 # Note: --with-zlib, --without-bz2lib; lzma/zstd/xml2/openssl linked via pkg-config --static
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \

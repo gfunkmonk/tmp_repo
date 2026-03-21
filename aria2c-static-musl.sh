@@ -22,14 +22,9 @@ ARIA2_MIRRORS=(
   "https://mirrors.lug.mtu.edu/gentoo/distfiles/aria2-${ARIA2_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "aria2" "${ARIA2_VERSION}" "${ARIA2_TARBALL}" "${ARIA2_MIRRORS[@]}"
-setup_alpine_chroot "${ARIA2_TARBALL}"
-copy_patches "aria2.patch"
-setup_qemu
-mount_chroot
+run_build_setup "aria2" "${ARIA2_VERSION}" "${ARIA2_TARBALL}" \
+  "aria2.patch" \
+  -- "${ARIA2_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

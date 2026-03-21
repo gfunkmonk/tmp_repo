@@ -13,14 +13,9 @@ LFTP_MIRRORS=(
   "https://fossies.org/linux/misc/lftp-${LFTP_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "lftp" "${LFTP_VERSION}" "${LFTP_TARBALL}" "${LFTP_MIRRORS[@]}"
-setup_alpine_chroot "${LFTP_TARBALL}"
-copy_patches "lftp.patch"
-setup_qemu
-mount_chroot
+run_build_setup "lftp" "${LFTP_VERSION}" "${LFTP_TARBALL}" \
+  "lftp.patch" \
+  -- "${LFTP_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
@@ -55,8 +50,8 @@ autoreconf -i -f && \
 ./configure CC=gcc CXX=g++ LIBS='-l:libreadline.a -l:libncursesw.a' \
   --with-openssl --without-gnutls --enable-static --enable-threads=posix --disable-nls --disable-shared \
   LDFLAGS='-static -Wl,--gc-sections' PKG_CONFIG='pkg-config --static' \
-  CFLAGS='-std=c17 -Os -static -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-unterminated-string-initialization -Wno-deprecated-declarations -no-pie' \
-  CXXFLAGS='-std=c++14 -Os -fomit-frame-pointer -ffunction-sections -fdata-sections -Wno-deprecated-declarations -Wno-error=template-id-cdtor' && \
+  CFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -std=c17 -Os -Wno-unterminated-string-initialization -Wno-deprecated-declarations -no-pie' \
+  CXXFLAGS='-Os -static -ffunction-sections -fdata-sections -fomit-frame-pointer -fno-stack-protector -std=c++14 -Wno-deprecated-declarations -Wno-error=template-id-cdtor' && \
 make -j\$(nproc) LDFLAGS='-static -all-static -Wl,--gc-sections' && \
 strip src/lftp && \
 ../upx --lzma src/lftp"

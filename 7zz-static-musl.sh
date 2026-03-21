@@ -19,14 +19,11 @@ SEVENZIP_MIRRORS=(
   "https://github.com/mcmilk/7-Zip-zstd/archive/refs/tags/${SEVENZIP_VERSION}.tar.gz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "7zz" "${SEVENZIP_VERSION}" "${SEVENZIP_TARBALL}" "${SEVENZIP_MIRRORS[@]}"
-setup_alpine_chroot "${SEVENZIP_TARBALL}"
-copy_patches "7z-0003-Disable-local-echo-display-when-in-input-passwords-C.patch" "7z-0004-Use-system-locale-to-select-codepage-for-legacy-zip-.patch" "7z-0005-Fix-BROTLI_MODEL-attribute-for-loongarch64.patch"
-setup_qemu
-mount_chroot
+run_build_setup "7zz" "${SEVENZIP_VERSION}" "${SEVENZIP_TARBALL}" \
+  "7z-0003-Disable-local-echo-display-when-in-input-passwords-C.patch" \
+  "7z-0004-Use-system-locale-to-select-codepage-for-legacy-zip-.patch" \
+  "7z-0005-Fix-BROTLI_MODEL-attribute-for-loongarch64.patch" \
+  -- "${SEVENZIP_MIRRORS[@]}"
 
 # Map repo ARCH to 7zip Linux makefile; source extracts flat so we wrap in a versioned dir
 case "${ARCH}" in

@@ -21,13 +21,8 @@ AXEL_MIRRORS=(
   "https://code.opensuse.org/package/axel/blob/master/f/axel-${AXEL_VERSION}.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "axel" "${AXEL_VERSION}" "${AXEL_TARBALL}" "${AXEL_MIRRORS[@]}"
-setup_alpine_chroot "${AXEL_TARBALL}"
-setup_qemu
-mount_chroot
+run_build_setup "axel" "${AXEL_VERSION}" "${AXEL_TARBALL}" \
+  -- "${AXEL_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \

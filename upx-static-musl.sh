@@ -19,14 +19,9 @@ UPX_MIRRORS=(
   "https://fossies.org/linux/misc/upx-${UPX_VERSION}-src.tar.xz"
 )
 
-setup_arch
-setup_cleanup
-install_host_deps
-download_source "upx" "${UPX_VERSION}" "${UPX_TARBALL}" "${UPX_MIRRORS[@]}"
-setup_alpine_chroot "${UPX_TARBALL}"
-copy_patches "upx-mod.patch"
-setup_qemu
-mount_chroot
+run_build_setup "upx" "${UPX_VERSION}" "${UPX_TARBALL}" \
+  "upx-mod.patch" \
+  -- "${UPX_MIRRORS[@]}"
 
 sudo chroot "./${CHROOTDIR}/" /bin/sh -c "set -e && apk update && apk add build-base \
 musl-dev \
