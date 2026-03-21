@@ -2,6 +2,19 @@
 # common.sh - Shared functions and variables for all *-static-musl.sh scripts.
 # Source this file at the top of each build script: . "$(dirname "$0")/common.sh"
 
+######### Variables ###########
+CHROOTDIR=${CHROOTDIR:pasta}
+ARCH=${ARCH:-x86_64}
+ALPINE_VERSION="3.23.3"
+ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
+JQ="tools/jq/jq-${ARCH}"
+CURL="tools/curl/curl-${ARCH}"
+
+# CCACHE_CHROOT_DIR: path inside the chroot where ccache stores its cache.
+# Set this to a host-mounted path (e.g. via CI cache) to persist ccache across builds.
+# Defaults to /ccache (ephemeral, inside the chroot).
+CCACHE_CHROOT_DIR="${CCACHE_CHROOT_DIR:-/ccache}"
+
 ##### Colors ################
 ORANGE="\033[38;2;255;165;0m"
 LEMON="\033[38;2;255;244;79m"
@@ -25,19 +38,6 @@ CORAL="\033[38;2;240;128;128m"
 CAMEL="\033[38;2;193;154;107m"
 INDIGO="\033[38;2;111;0;255m"
 NC="\033[0m"
-
-######### Variables ###########
-CHROOTDIR="pasta"
-ARCH=${ARCH:-x86_64}
-ALPINE_VERSION="3.23.3"
-ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
-JQ="tools/jq/jq-${ARCH}"
-CURL="tools/curl/curl-${ARCH}"
-
-# CCACHE_CHROOT_DIR: path inside the chroot where ccache stores its cache.
-# Set this to a host-mounted path (e.g. via CI cache) to persist ccache across builds.
-# Defaults to /ccache (ephemeral, inside the chroot).
-CCACHE_CHROOT_DIR="${CCACHE_CHROOT_DIR:-/ccache}"
 
 setup_tools() {
   if [[ -x "${JQ}" ]]; then
@@ -206,6 +206,7 @@ setup_qemu() {
 # mount_chroot: bind-mount proc/dev/sys into the chroot directory
 mount_chroot() {
   echo -e "${VIOLET}= mount, bind and chroot into dir${NC}"
+  ccachelogdir=$(ccache -p | grep log_file | cut -d "=" -f2 | rev | cut -d'/' -f2- | rev)
   sudo mount --rbind /dev "./${CHROOTDIR}/dev/"
   sudo mount --make-rslave "./${CHROOTDIR}/dev/"
   sudo mount -t proc none "./${CHROOTDIR}/proc/"
@@ -214,7 +215,9 @@ mount_chroot() {
   if [ -n "${CCACHE_DIR:-}" ] && [ -d "${CCACHE_DIR}" ]; then
     sudo mkdir -p "./${CHROOTDIR}/${CCACHE_CHROOT_DIR}"
     sudo mount --bind "${CCACHE_DIR}" "./${CHROOTDIR}/${CCACHE_CHROOT_DIR}"
-    sudo mkdir -p "./${CHROOTDIR}/var/log/ccache/"
+    if [ -n "$ccachelogdir" ]; then
+      sudo mkdir -p "./${CHROOTDIR}/var/log/ccache/"
+    fi
   fi
 }
 
