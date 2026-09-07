@@ -46,7 +46,7 @@ ARMHF_FLAGS="-march=armv6kz -mfloat-abi=hard -mfpu=vfp -marm"
 ######### Variables ###########
 # Alpine minirootfs version   #
 ###############################
-ALPINE_VERSION="3.23.4"
+ALPINE_VERSION="3.24.1"
 ALPINE_MAJOR_MINOR="${ALPINE_VERSION%.*}"
 
 # Set directory name for the target chroot
