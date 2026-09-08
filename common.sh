@@ -679,7 +679,7 @@ rust_host_cross_build() {
 
   rustup target add "${RUST_TARGET}"
   if ! command -v cargo-zigbuild >/dev/null 2>&1; then
-    cargo install cargo-zigbuild --locked
+    cargo install cargo-zigbuild@0.23.1 --locked
   fi
 
   echo -e "${LIME}= Extracting ${tool} source${NC}"
